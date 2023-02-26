@@ -27,7 +27,7 @@ export default apiInitializer("0.8", (api) => {
       console.log('id: ' + currentUser.id); 
     }
 
-    var showOnlyToAdmins = settings.enable_modal_only_for_admins; //make this false to enable component all users
+    var showOnlyToAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
     var isAdmin = (currentUser.admin)        
     blockModal = (showOnlyToAdmins && !isAdmin);
 
