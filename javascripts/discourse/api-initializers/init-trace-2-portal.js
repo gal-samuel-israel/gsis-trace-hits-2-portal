@@ -2,7 +2,7 @@ import { apiInitializer } from "discourse/lib/api";
 
 export default apiInitializer("0.8", (api) => {
 
-  var blockModal;  
+  var blockTrace;  
 
   if (api.getCurrentUser()) {
     const currentUser = api.getCurrentUser()
@@ -18,20 +18,23 @@ export default apiInitializer("0.8", (api) => {
     if(debug4All){ debug = true; }
     
     //const user = container.lookup("service:current-user");
+    const router = this.container.lookup("service:router");
 
     if(debug){          
       console.log('trace-2-portal initializer:');
       //console.log(user);
-      //console.log(currentUser.user_option);
+      console.log('router: ', router);
       console.log('admin: ' + currentUser.admin); 
       console.log('id: ' + currentUser.id); 
     }
 
-    var showOnlyToAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
+    var traceOnlyToAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
     var isAdmin = (currentUser.admin)        
-    blockModal = (showOnlyToAdmins && !isAdmin);
+    blockTrace = (traceOnlyToAdmins && !isAdmin);
 
-    if(!blockModal){
+    if(!blockTrace){
+      if(debug){ console.log('trace active');}
+      /*
       api.registerConnectorClass("above-site-header", "home-modal", {
         shouldRender() {
           return true;
@@ -41,6 +44,7 @@ export default apiInitializer("0.8", (api) => {
       api.createWidget("home-modal-widget", {
         tagName: "div.home-modal",
       });
+      */
     }
 
   }  
