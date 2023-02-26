@@ -1,4 +1,5 @@
 import { apiInitializer } from "discourse/lib/api";
+import { getOwner } from "discourse-common/lib/get-owner";
 
 export default apiInitializer("0.8", (api) => {
 
@@ -28,7 +29,12 @@ export default apiInitializer("0.8", (api) => {
     blockTrace = (traceOnlyToAdmins && !isAdmin);
 
     if(!blockTrace){
-      if(debug){ console.log('trace active'); }
+      if(debug){ 
+        console.log('trace active'); 
+
+        const path = getOwner(this).lookup('controller:application').get('currentPath');
+        console.log('path:', path); 
+      }
       /*
       api.registerConnectorClass("above-site-header", "home-modal", {
         shouldRender() {
