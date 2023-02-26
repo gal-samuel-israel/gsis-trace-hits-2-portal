@@ -15,15 +15,11 @@ export default apiInitializer("0.8", (api) => {
     }
 
     var debug4All = settings.enable_debug_for_all;
-    if(debug4All){ debug = true; }
-    
-    //const user = container.lookup("service:current-user");
-    //const router = container.lookup("service:router");
+    if(debug4All){ debug = true; }    
 
     if(debug){          
       console.log('trace-2-portal initializer:');
-      //console.log(user);
-      console.log('router: ', this.router);
+      console.log('container: ', this.container);
       console.log('admin: ' + currentUser.admin); 
       console.log('id: ' + currentUser.id); 
     }
@@ -33,7 +29,7 @@ export default apiInitializer("0.8", (api) => {
     blockTrace = (traceOnlyToAdmins && !isAdmin);
 
     if(!blockTrace){
-      if(debug){ console.log('trace active');}
+      if(debug){ console.log('trace active'); }
       /*
       api.registerConnectorClass("above-site-header", "home-modal", {
         shouldRender() {
