@@ -18,7 +18,7 @@ export default apiInitializer("0.8", (api) => {
     if(debug4All){ debug = true; }
     
     //const user = container.lookup("service:current-user");
-    const router = this.container.lookup("service:router");
+    const router = container.lookup("service:router");
 
     if(debug){          
       console.log('trace-2-portal initializer:');

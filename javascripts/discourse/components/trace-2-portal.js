@@ -90,7 +90,7 @@ export default Component.extend({
 
   @discourseComputed("currentUser")
   displayForUser(currentUser) {         
-    var traceOnlyAdmins = settings.enable_modal_only_for_admins; //make this false to enable component all users
+    var traceOnlyAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
     var isAdmin = (currentUser.admin)        
     var blockDisplay = (traceOnlyAdmins && !isAdmin);
 
