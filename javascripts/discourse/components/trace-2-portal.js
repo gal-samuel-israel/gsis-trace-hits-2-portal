@@ -59,7 +59,8 @@ export default Component.extend({
       return false;
     }
     
-    //get user json
+    //call AJAX
+    /*
     ajax(`/u/${this.currentUser.username}.json`)
     .then((data) => {        
         if(this.debug){     
@@ -74,7 +75,7 @@ export default Component.extend({
         }
 
       }).catch(popupAjaxError);      
-      
+    */  
   },  
   
   @discourseComputed("router.currentRouteName")

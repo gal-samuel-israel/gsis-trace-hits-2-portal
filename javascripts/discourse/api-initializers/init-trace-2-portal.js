@@ -19,7 +19,6 @@ export default apiInitializer("0.8", (api) => {
 
     if(debug){          
       console.log('trace-2-portal initializer:');
-      console.log('container: ', this.container);
       console.log('admin: ' + currentUser.admin); 
       console.log('id: ' + currentUser.id); 
     }
