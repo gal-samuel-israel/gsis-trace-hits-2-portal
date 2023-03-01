@@ -32,8 +32,10 @@ export default apiInitializer("0.8", (api) => {
       if(debug){ 
         console.log('trace active'); 
 
+        const router = api.container.lookup("router:main");
         const path = getOwner(this).lookup('controller:application').get('currentPath');
         console.log('path:', path); 
+        console.log('router:', router); 
       }
       /*
       api.registerConnectorClass("above-site-header", "home-modal", {
