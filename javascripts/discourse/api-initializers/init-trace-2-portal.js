@@ -1,5 +1,5 @@
 import { apiInitializer } from "discourse/lib/api";
-import { getOwner } from "discourse-common/lib/get-owner";
+import { viewTrackingRequired } from 'discourse/lib/ajax';
 
 export default apiInitializer("0.8", (api) => {
 
@@ -31,23 +31,25 @@ export default apiInitializer("0.8", (api) => {
     if(!blockTrace){
       if(debug){ 
         console.log('trace active'); 
-
         const router = api.container.lookup("router:main");
-        const path = getOwner(this).lookup('controller:application').get('currentPath');
-        console.log('path:', path); 
         console.log('router:', router); 
+
+        router.on('willTransition', viewTrackingRequired);
+
+          let appEvents = container.lookup('service:app-events');
+          startPageTracking(router, appEvents);
+
+          appEvents.on('page:changed', data => {
+            var urlPrefix = "/t/";
+            var pattern = new RegExp('^' + urlPrefix);
+            var hasPrefix = pattern.test(data.url);
+            if(hasPrefix) {
+              console.log('url:', data.url); 
+            }
+          });
+
       }
-      /*
-      api.registerConnectorClass("above-site-header", "home-modal", {
-        shouldRender() {
-          return true;
-        },
-      });
-    
-      api.createWidget("home-modal-widget", {
-        tagName: "div.home-modal",
-      });
-      */
+   
     }
 
   }  
