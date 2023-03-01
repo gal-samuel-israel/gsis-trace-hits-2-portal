@@ -1,4 +1,5 @@
 import { apiInitializer } from "discourse/lib/api";
+import { startPageTracking } from 'discourse/lib/page-tracker';
 import { viewTrackingRequired } from 'discourse/lib/ajax';
 
 export default apiInitializer("0.8", (api) => {
