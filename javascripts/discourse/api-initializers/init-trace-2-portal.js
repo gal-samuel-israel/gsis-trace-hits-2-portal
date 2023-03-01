@@ -36,7 +36,7 @@ export default apiInitializer("0.8", (api) => {
 
         router.on('willTransition', viewTrackingRequired);
 
-          let appEvents = container.lookup('service:app-events');
+          let appEvents = api.container.lookup('service:app-events');
           startPageTracking(router, appEvents);
 
           appEvents.on('page:changed', data => {
