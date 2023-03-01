@@ -41,7 +41,7 @@ export default apiInitializer("0.8", (api) => {
           startPageTracking(router, appEvents);
 
           appEvents.on('page:changed', data => {
-            var urlPrefix = "/t/";
+            var urlPrefix = "(/t/|/search|/c/";
             var pattern = new RegExp('^' + urlPrefix);
             var hasPrefix = pattern.test(data.url);
             if(hasPrefix) {
