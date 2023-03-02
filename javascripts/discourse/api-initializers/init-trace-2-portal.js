@@ -29,39 +29,6 @@ export default apiInitializer("0.8", (api) => {
     var isAdmin = (currentUser.admin)        
     blockTrace = (traceOnlyToAdmins && !isAdmin);
 
-    const setUpXHR_REplacement = function() {
-      var open = window.XMLHttpRequest.prototype.open,
-        send = window.XMLHttpRequest.prototype.send;
-      function openReplacement(method, url, async, user, password) {
-        this._url = url;
-        return open.apply(this, arguments);
-      }
-      function sendReplacement(data) {
-        if(this.onreadystatechange) {
-          this._onreadystatechange = this.onreadystatechange;
-        }
-        /**
-         * PLACE HERE YOUR CODE WHEN REQUEST IS SENT  
-         */
-        console.log('requestSet',data);
-
-        this.onreadystatechange = onReadyStateChangeReplacement;
-        return send.apply(this, arguments);
-      }
-      function onReadyStateChangeReplacement() {
-        /**
-         * PLACE HERE YOUR CODE FOR READYSTATECHANGE
-         */
-        console.log('readyStateChange', arguments);
-        
-        if(this._onreadystatechange) {
-          return this._onreadystatechange.apply(this, arguments);
-        }
-      }
-      window.XMLHttpRequest.prototype.open = openReplacement;
-      window.XMLHttpRequest.prototype.send = sendReplacement;
-    };
-
     if(!blockTrace){
       if(debug){ 
           console.log('trace active'); 
@@ -81,8 +48,6 @@ export default apiInitializer("0.8", (api) => {
               console.log('url:', data.url); 
             }
           });
-
-          setUpXHR_REplacement();
 
           /*
           appEvents.on('post-stream:refresh', data => {
