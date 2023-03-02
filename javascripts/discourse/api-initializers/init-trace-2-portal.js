@@ -21,8 +21,8 @@ export default apiInitializer("0.8", (api) => {
 
     if(debug){          
       console.log('trace-2-portal initializer:');
-      console.log('admin: ' + currentUser.admin); 
-      console.log('id: ' + currentUser.id); 
+      console.log('admin:' + currentUser.admin); 
+      console.log('currentUser:' + currentUser); 
     }
 
     var traceOnlyToAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
@@ -47,6 +47,10 @@ export default apiInitializer("0.8", (api) => {
             if(hasPrefix) {
               console.log('url:', data.url); 
             }
+          });
+
+          appEvents.on('post-stream:refresh', data => {
+            console.log('post-stream:refresh', data);
           });
 
       }
