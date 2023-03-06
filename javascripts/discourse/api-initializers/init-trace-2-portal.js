@@ -60,6 +60,7 @@ export default apiInitializer("0.8", (api) => {
                     url: encodeURIComponent(data.url),
                     xid: currentUser.external_id,                    
                   },
+                  redirect: 'follow',
                 })
                   .catch((data)=>{
                     if(debug){ console.log('catch', data);}
