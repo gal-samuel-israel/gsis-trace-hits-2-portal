@@ -16,3 +16,7 @@ enable_tracing_only_for_admins:
   type: bool
   default: true
   description: "disable to make this component trace hits of Non Admins (All users)"
+trace_to_live_portal:
+  type: bool
+  default: false
+  description: "check for live portal or un-check for DEV server"
