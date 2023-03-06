@@ -22,7 +22,7 @@ export default apiInitializer("0.8", (api) => {
     if(debug){          
       console.log('trace-2-portal initializer:');
       console.log('admin:' + currentUser.admin); 
-      console.log('currentUser:' + currentUser); 
+      console.log('currentUser.external_id:' + currentUser.external_id); 
     }
 
     var traceOnlyToAdmins = settings.enable_tracing_only_for_admins; //make this false to enable component all users
