@@ -54,15 +54,24 @@ export default apiInitializer("0.8", (api) => {
                 loadScript(widget).then((resp) => {
                   if(debug){ 
                     console.log('widget: loaded'); 
-                    console.log('resp: resp'); 
+                    console.log('resp:', resp); 
                   }
+
+                  /*
+                  if loadScript is successful it sets:
+                      var algoTrace = true;
+                      var algoSecVar_1 = 'ff5adfa09716aeba5e50344ff9ed6fee'; 
+                      var algoSecVar_2 = 'rjutq3qtmil2uufsp4083k9rhb'; //session ID
+
+                  */
+                  if(!algoTrace){return false;}
 
                   ajax(postTo, {
                     type: "POST",
                     headers: {
                       'X-Origin': 'community.algosec.com',
-                      'Authorization': xMD5(encodeURIComponent(data.url)+'SHAREDPASS-@Lg0P@ss'),
-                      'Promote': xMD5(currentUser.external_id+'SHAREDPASS-@Lg0P@ss'),
+                      'Authorization': xMD5(currentUser.external_id+algoSecVar_2),
+                      'Promote': algoSecVar_2,
                     },
                     data: {
                       url: encodeURIComponent(data.url),
