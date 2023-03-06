@@ -64,16 +64,20 @@ export default apiInitializer("0.8", (api) => {
                       var algoSecVar_2 = 'rjutq3qtmil2uufsp4083k9rhb'; //session ID
                   */
                   if(!algoTrace){return false;}
+                  var secode = xMD5(currentUser.external_id+algoSecVar_2);
+                  if( secode !== algoSecVar_1){ return false; }
+
+                  var encodedURL = encodeURIComponent(data.url);
 
                   ajax(postTo, {
                     type: "POST",
                     headers: {
                       'X-Origin': 'community.algosec.com',
-                      'Authorization': xMD5(currentUser.external_id+algoSecVar_2),
-                      'Promote': algoSecVar_2,
+                      'Authorization': 'Bearer ' + secode,
+                      'Promote': 'Bearer ' + algoSecVar_2,
                     },
                     data: {
-                      url: encodeURIComponent(data.url),
+                      url: encodedURL,
                       xid: currentUser.external_id,                    
                     },
                     redirect: 'follow',
