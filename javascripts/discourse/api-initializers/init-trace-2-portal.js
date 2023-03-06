@@ -1,6 +1,7 @@
 import { apiInitializer } from "discourse/lib/api";
 import { startPageTracking } from 'discourse/lib/page-tracker';
 import { viewTrackingRequired, ajax} from 'discourse/lib/ajax';
+import loadScript from "discourse/lib/load-script";
 
 export default apiInitializer("0.8", (api) => {
 
@@ -49,6 +50,11 @@ export default apiInitializer("0.8", (api) => {
 
                 var postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
                 var postTo = postToHost +'/user/community/comtr-action.php';
+                var widget = postToHost +'/widget.js';
+                loadScript(widget).then(() => {
+                  console.log('widget: loaded');
+                });
+                
                 ajax(postTo, {
                   type: "POST",
                   headers: {
@@ -70,6 +76,12 @@ export default apiInitializer("0.8", (api) => {
                   });
 
             }
+          });
+
+          api.registerConnectorClass("above-site-header", "home-modal", {
+            shouldRender() {
+              return true;
+            },
           });
    
     }
