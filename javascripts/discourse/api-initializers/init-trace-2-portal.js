@@ -62,7 +62,6 @@ export default apiInitializer("0.8", (api) => {
                       var algoTrace = true;
                       var algoSecVar_1 = 'ff5adfa09716aeba5e50344ff9ed6fee'; 
                       var algoSecVar_2 = 'rjutq3qtmil2uufsp4083k9rhb'; //session ID
-
                   */
                   if(!algoTrace){return false;}
 
