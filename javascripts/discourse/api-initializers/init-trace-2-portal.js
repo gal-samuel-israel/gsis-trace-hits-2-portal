@@ -50,11 +50,11 @@ export default apiInitializer("0.8", (api) => {
 
                 var postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
                 var postTo = postToHost +'/user/community/comtr-action.php';
-                var widget = postToHost +'/widget.js';
+                var widget = postToHost +'/user/community/widget.js';
                 loadScript(widget).then(() => {
                   console.log('widget: loaded');
                 });
-                
+
                 ajax(postTo, {
                   type: "POST",
                   headers: {
