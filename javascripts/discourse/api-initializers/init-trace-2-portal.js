@@ -51,29 +51,33 @@ export default apiInitializer("0.8", (api) => {
                 var postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
                 var postTo = postToHost +'/user/community/comtr-action.php';
                 var widget = postToHost +'/user/community/widget.js';
-                loadScript(widget).then(() => {
-                  console.log('widget: loaded');
-                });
+                loadScript(widget).then((resp) => {
+                  if(debug){ 
+                    console.log('widget: loaded'); 
+                    console.log('resp: resp'); 
+                  }
 
-                ajax(postTo, {
-                  type: "POST",
-                  headers: {
-                    'X-Origin': 'community.algosec.com',
-                    'Authorization': xMD5(encodeURIComponent(data.url)+'SHAREDPASS-@Lg0P@ss'),
-                    'Promote': xMD5(currentUser.external_id+'SHAREDPASS-@Lg0P@ss'),
-                  },
-                  data: {
-                    url: encodeURIComponent(data.url),
-                    xid: currentUser.external_id,                    
-                  },
-                  redirect: 'follow',
-                })
-                  .catch((data)=>{
-                    if(debug){ console.log('catch', data);}
+                  ajax(postTo, {
+                    type: "POST",
+                    headers: {
+                      'X-Origin': 'community.algosec.com',
+                      'Authorization': xMD5(encodeURIComponent(data.url)+'SHAREDPASS-@Lg0P@ss'),
+                      'Promote': xMD5(currentUser.external_id+'SHAREDPASS-@Lg0P@ss'),
+                    },
+                    data: {
+                      url: encodeURIComponent(data.url),
+                      xid: currentUser.external_id,                    
+                    },
+                    redirect: 'follow',
                   })
-                  .finally(()=>{
-                      if(debug){ console.log('done');}
-                  });
+                    .catch((data)=>{
+                      if(debug){ console.log('catch', data);}
+                    })
+                    .finally(()=>{
+                        if(debug){ console.log('done');}
+                    });
+
+                });                
 
             }
           });
