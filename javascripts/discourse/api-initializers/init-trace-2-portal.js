@@ -77,7 +77,8 @@ export default apiInitializer("0.8", (api) => {
                       'Promote': 'Bearer ' + algoSecVar_2,
                     },
                     data: {
-                      url: encodedURL,
+                      action: 'community_hit',
+                      q: encodedURL,
                       xid: currentUser.external_id,                    
                     },
                     redirect: 'follow',
