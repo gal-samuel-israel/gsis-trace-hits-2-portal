@@ -42,10 +42,13 @@ export default apiInitializer("0.8", (api) => {
           startPageTracking(router, appEvents);
 
           appEvents.on('page:changed', data => {
-            var urlPrefix = "(/t/|/search|/c/)";
+            var urlPrefix = "(/t/|/c/|/tag/)";
+            var searchPrefix = "(/search)";
             var pattern = new RegExp('^' + urlPrefix);
+            var s_pattern = new RegExp('^' + searchPrefix);
             var hasPrefix = pattern.test(data.url);
-            if(hasPrefix) {
+            var hasSearchPrefix = s_pattern.test(data.url);
+            if(hasPrefix || hasSearchPrefix) {
                 if(debug){ console.log('url:', data.url); }
 
                 var postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
@@ -54,14 +57,16 @@ export default apiInitializer("0.8", (api) => {
                 loadScript(widget).then((resp) => {
                   if(debug){ 
                     console.log('widget: loaded'); 
-                    console.log('resp:', resp); 
+                    console.log('hasSearchPrefix:', hasSearchPrefix); 
+                    console.log('hasPrefix:', hasPrefix); 
                   }
 
+                  var the_action = (hasPrefix) ? 'community_hit':'community_search';
                   /*
                   if loadScript is successful it sets:
                       var algoTrace = true;
-                      var algoSecVar_1 = 'ff5adfa09716aeba5e50344ff9ed6fee'; 
-                      var algoSecVar_2 = 'rjutq3qtmil2uufsp4083k9rhb'; //session ID
+                      var algoSecVar_1 = 'string'; 
+                      var algoSecVar_2 = 'string'; //session ID
                   */
                   if(!algoTrace){return false;}
                   var secode = xMD5(currentUser.external_id+algoSecVar_2);
@@ -77,7 +82,7 @@ export default apiInitializer("0.8", (api) => {
                       'Promote': 'Bearer ' + algoSecVar_2,
                     },
                     data: {
-                      action: 'community_hit',
+                      action: the_action,
                       q: encodedURL,
                       xid: currentUser.external_id,                    
                     },
