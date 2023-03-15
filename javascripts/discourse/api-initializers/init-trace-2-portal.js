@@ -59,13 +59,19 @@ export default apiInitializer("0.8", (api) => {
 
               */
               
+              traceTerm: null,
+
               searchTermChanged(term, opts = {}) {
                 console.log('searchTermChanged', term, opts);
+                this.traceTerm = term;
+
                 this._super(term, opts = {});
               },
 
               keyDown(e) {
-                console.log('keyDown', e, e.key);
+                console.log('keyDown e', e);
+                console.log('keyDown e.key', e.key);
+                
                 this._super(e);
               },
 
