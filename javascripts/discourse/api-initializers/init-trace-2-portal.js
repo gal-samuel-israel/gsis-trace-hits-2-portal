@@ -55,28 +55,15 @@ export default apiInitializer("0.8", (api) => {
               triggerSearch(){
                 console.log('triggerSearch', this)
                 this._super();
-              },
+              },              
 
+              */
+              
               searchTermChanged(term, opts = {}) {
                 console.log('searchTermChanged', term, opts);
                 this._super(term, opts = {});
               },
-
-              */
-
-              _activeSearch(term, {
-                typeFilter,
-                fullSearchUrl,
-                searchContext,
-              }){
-                console.log('_activeSearch', term);
-
-                this.super(term, {
-                  typeFilter,
-                  fullSearchUrl,
-                  searchContext,
-                });
-              },
+              
 
             });
           }
