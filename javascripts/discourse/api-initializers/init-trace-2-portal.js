@@ -66,7 +66,7 @@ export default apiInitializer("0.8", (api) => {
                 if(debug){console.log('searchTermChanged', term, opts);}
                 this.traceTerm = term;
                 if(opts?.searchTopics ){
-                  if(debug){console.log('clicked searchTopic:', term);}
+                  if(debug){console.log('clicked searchTopic lets trace:', this.traceTerm);}
                 }
                 
                 return this._super(term, opts = {});
@@ -75,6 +75,7 @@ export default apiInitializer("0.8", (api) => {
               keyDown(e) {                                
                 if (e.key === "Enter") {
                   if(debug){console.log('e.key', e.key);}
+                  if(debug){console.log('clicked Enter lets trace:', this.traceTerm);}
                 }
 
                 return this._super(e);
