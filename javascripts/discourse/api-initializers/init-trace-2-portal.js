@@ -41,34 +41,19 @@ export default apiInitializer("0.8", (api) => {
           let appEvents = api.container.lookup('service:app-events');
           startPageTracking(router, appEvents);
 
+          const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
+
           if(debug){
             api.reopenWidget("search-menu", {
-              /*
-              override any function in 
-              \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js
-
-              html(attrs, state) {
-                console.log('reopenWidget');
-                return this._super(attrs, state);                
-              },                            
-
-              triggerSearch(){
-                console.log('triggerSearch', this)
-                this._super();
-              },              
-
-              */
-              
+              /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
               traceTerm: null,
 
-              searchTermChanged(term, opts = {}) {
-                
+              searchTermChanged(term, opts = {}) {                
                 if(debug){console.log('searchTermChanged', term, opts);}
                 this.traceTerm = term;
                 if(opts?.searchTopics ){
                   if(debug){console.log('clicked searchTopic lets trace:', this.traceTerm);}
-                }
-                
+                }                
                 return this._super(term, opts);
               },
 
@@ -78,7 +63,6 @@ export default apiInitializer("0.8", (api) => {
                   if(debug){console.log('e.key', e.key);}
                   if(debug){console.log('clicked Enter lets trace:', this.traceTerm);}
                 }
-
                 return this._super(e);
               },
 
@@ -94,8 +78,7 @@ export default apiInitializer("0.8", (api) => {
             var hasSearchPrefix = s_pattern.test(data.url);
             if(hasPrefix || hasSearchPrefix) {
                 if(debug){ console.log('url:', data.url); }
-
-                var postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
+                
                 var postTo = postToHost +'/user/community/comtr-action.php';
                 var widget = postToHost +'/user/community/widget.js';
                 loadScript(widget).then((resp) => {
