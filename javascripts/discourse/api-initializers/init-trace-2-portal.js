@@ -47,17 +47,17 @@ export default apiInitializer("0.8", (api) => {
               html(attrs, state) {
                 console.log('reopenWidget');
                 return this._super(attrs, state);                
-              },
-              
-              searchTermChanged(term, opts = {}) {
-                console.log('searchTermChanged');
-                this._super(term, opts = {});
-              },
-              */
-             
+              },                            
+
               triggerSearch(){
                 console.log('triggerSearch', this)
                 this._super();
+              },
+              */
+
+              searchTermChanged(term, opts = {}) {
+                console.log('searchTermChanged', term, opts);
+                this._super(term, opts = {});
               },
 
             });
