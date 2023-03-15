@@ -42,8 +42,11 @@ export default apiInitializer("0.8", (api) => {
           startPageTracking(router, appEvents);
 
           if(debug){
-            appEvents.on('post-stream:refresh', data => {
-              console.log('post-stream:refresh', data);
+            api.reopenWidget("search-menu", {
+              html(attrs, state) {
+                console.log('reopenWidget');
+                return this._super(attrs, state);                
+              },
             });
           }
 
