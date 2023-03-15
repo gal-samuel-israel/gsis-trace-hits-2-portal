@@ -44,6 +44,9 @@ export default apiInitializer("0.8", (api) => {
           if(debug){
             api.reopenWidget("search-menu", {
               /*
+              override any function in 
+              \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js
+
               html(attrs, state) {
                 console.log('reopenWidget');
                 return this._super(attrs, state);                
@@ -53,11 +56,26 @@ export default apiInitializer("0.8", (api) => {
                 console.log('triggerSearch', this)
                 this._super();
               },
-              */
 
               searchTermChanged(term, opts = {}) {
                 console.log('searchTermChanged', term, opts);
                 this._super(term, opts = {});
+              },
+
+              */
+
+              _activeSearch(term, {
+                typeFilter,
+                fullSearchUrl,
+                searchContext,
+              }){
+                console.log('_activeSearch', term);
+
+                this.super(term, {
+                  typeFilter,
+                  fullSearchUrl,
+                  searchContext,
+                });
               },
 
             });
