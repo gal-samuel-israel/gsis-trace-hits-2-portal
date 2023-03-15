@@ -43,9 +43,15 @@ export default apiInitializer("0.8", (api) => {
 
           if(debug){
             api.reopenWidget("search-menu", {
+              /*
               html(attrs, state) {
                 console.log('reopenWidget');
                 return this._super(attrs, state);                
+              },
+              */
+              searchTermChanged(term, opts = {}) {
+                console.log('searchTermChanged');
+                this._super(term, opts = {});
               },
             });
           }
