@@ -59,7 +59,7 @@ export default apiInitializer("0.8", (api) => {
 
               */
               
-              traceTerm: document.getElementById("search-term"),
+              traceTerm: null,
 
               searchTermChanged(term, opts = {}) {
                 
@@ -69,11 +69,12 @@ export default apiInitializer("0.8", (api) => {
                   if(debug){console.log('clicked searchTopic lets trace:', this.traceTerm);}
                 }
                 
-                return this._super(term, opts = {});
+                return this._super(term, opts);
               },
 
               keyDown(e) {                                
                 if (e.key === "Enter") {
+                  this.traceTerm = document.getElementById("search-term");
                   if(debug){console.log('e.key', e.key);}
                   if(debug){console.log('clicked Enter lets trace:', this.traceTerm);}
                 }
