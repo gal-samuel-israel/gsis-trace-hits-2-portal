@@ -62,17 +62,22 @@ export default apiInitializer("0.8", (api) => {
               traceTerm: null,
 
               searchTermChanged(term, opts = {}) {
-                console.log('searchTermChanged', term, opts);
+                
+                if(debug){console.log('searchTermChanged', term, opts);}
                 this.traceTerm = term;
-
-                this._super(term, opts = {});
+                if(opts?.searchTopics ){
+                  if(debug){console.log('clicked searchTopic:', term);}
+                }
+                
+                return this._super(term, opts = {});
               },
 
-              keyDown(e) {
-                console.log('keyDown e', e);
-                console.log('keyDown e.key', e.key);
-                
-                this._super(e);
+              keyDown(e) {                                
+                if (e.key === "Enter") {
+                  if(debug){console.log('e.key', e.key);}
+                }
+
+                return this._super(e);
               },
 
             });
