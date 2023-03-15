@@ -74,7 +74,7 @@ export default apiInitializer("0.8", (api) => {
 
               keyDown(e) {                                
                 if (e.key === "Enter") {
-                  this.traceTerm = document.getElementById("search-term");
+                  this.traceTerm = document.getElementById("search-term").value;
                   if(debug){console.log('e.key', e.key);}
                   if(debug){console.log('clicked Enter lets trace:', this.traceTerm);}
                 }
