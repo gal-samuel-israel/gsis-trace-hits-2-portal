@@ -41,6 +41,12 @@ export default apiInitializer("0.8", (api) => {
           let appEvents = api.container.lookup('service:app-events');
           startPageTracking(router, appEvents);
 
+          if(debug){
+            appEvents.on('post-stream:refresh', data => {
+              console.log('post-stream:refresh', data);
+            });
+          }
+
           appEvents.on('page:changed', data => {
             var urlPrefix = "(/t/)"; // |/c/|/tag/ 
             var searchPrefix = "(/search)";
