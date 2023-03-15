@@ -59,7 +59,7 @@ export default apiInitializer("0.8", (api) => {
 
               */
               
-              traceTerm: null,
+              traceTerm: document.getElementById("search-term"),
 
               searchTermChanged(term, opts = {}) {
                 
