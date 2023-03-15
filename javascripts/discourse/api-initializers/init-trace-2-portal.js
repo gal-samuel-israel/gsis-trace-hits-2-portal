@@ -63,7 +63,11 @@ export default apiInitializer("0.8", (api) => {
                 console.log('searchTermChanged', term, opts);
                 this._super(term, opts = {});
               },
-              
+
+              keyDown(e) {
+                console.log('keyDown', e, e.key);
+                this._super(e);
+              },
 
             });
           }
