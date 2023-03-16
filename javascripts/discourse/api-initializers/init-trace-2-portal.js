@@ -72,14 +72,7 @@ export default apiInitializer("0.8", (api) => {
                 console.log('algoTrace:', algoTrace); 
                 console.log('algoSecVar_1:', algoSecVar_1); 
                 console.log('algoSecVar_2:', algoSecVar_2); 
-              }
-
-              const router = api.container.lookup("router:main");
-              router.on('willTransition', viewTrackingRequired);
-              //if(debug){ console.log('router:', router); }              
-
-              let appEvents = api.container.lookup('service:app-events');
-              startPageTracking(router, appEvents);
+              }              
 
               if(debug){
                 api.reopenWidget("search-menu", {
@@ -136,6 +129,13 @@ export default apiInitializer("0.8", (api) => {
                 });
               }
 
+              const router = api.container.lookup("router:main");
+              router.on('willTransition', viewTrackingRequired);
+              //if(debug){ console.log('router:', router); }              
+
+              let appEvents = api.container.lookup('service:app-events');
+              startPageTracking(router, appEvents);
+
               appEvents.on('page:changed', data => {
                 var urlPrefix = "(/t/)"; // |/c/|/tag/ 
                 var searchPrefix = "(/search)";
@@ -169,12 +169,13 @@ export default apiInitializer("0.8", (api) => {
                 }
               });
           }); 
-
+          /*
           api.registerConnectorClass("above-site-header", "home-modal", {
             shouldRender() {
               return true;
             },
           });
+          */
    
     }
 
