@@ -36,109 +36,107 @@ export default apiInitializer("0.8", (api) => {
     
     if(!blockTrace){
           if(debug){ console.log('trace active'); }
-          const router = api.container.lookup("router:main");
-          if(debug){ console.log('router:', router); }
           
-          router.on('willTransition', viewTrackingRequired);
-
-          let appEvents = api.container.lookup('service:app-events');
-          startPageTracking(router, appEvents);
-
           const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
 
-          if(debug){
-            api.reopenWidget("search-menu", {
-              /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
-              traceTerm: null,
-
-              searchTermChanged(term, opts = {}) {                
-                if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
-                this.traceTerm = term;
-                if(opts?.searchTopics ){
-                  if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
-                }                
-                return this._super(term, opts);
-              },
-
-              keyDown(e) {                                
-                if (e.key === "Enter") {
-                  this.traceTerm = document.getElementById("search-term").value;
-                  if(debugSearchTracer){
-                    console.log('e.key', e.key);
-                    console.log('clicked Enter lets trace:', this.traceTerm);
-                  }
-                }
-                return this._super(e);
-              },
-
-            });
-          }
-
-          appEvents.on('page:changed', data => {
-            var urlPrefix = "(/t/)"; // |/c/|/tag/ 
-            var searchPrefix = "(/search)";
-            var pattern = new RegExp('^' + urlPrefix);
-            var s_pattern = new RegExp('^' + searchPrefix);
-            var hasPrefix = pattern.test(data.url);
-            var hasSearchPrefix = s_pattern.test(data.url);
-            if(hasPrefix || hasSearchPrefix) {
-                if(debugHitsTracer){ 
-                  console.log('url:', data.url); 
-                  console.log('hasSearchPrefix:', hasSearchPrefix); 
-                  console.log('hasPrefix:', hasPrefix); 
-                }
-                
-                var postTo = postToHost +'/user/community/comtr-action.php';
-                var widget = postToHost +'/user/community/widget.js';
-                loadScript(widget).then((resp) => {
-                  if(debugHitsTracer){ 
-                    console.log('widget.js: loaded');                     
-                  }
-
-                  var the_action = (hasPrefix) ? 'community_hit':'community_search';
-                  /*
+          var postTo = postToHost +'/user/community/comtr-action.php';
+          var widget = postToHost +'/user/community/widget.js';
+          loadScript(widget).then((resp) => {
+            if(debug){ console.log('widget.js: loaded'); }
+              /*
                   if loadScript is successful it sets:
-                      var algoTrace = true;
-                      var algoSecVar_1 = 'string'; 
-                      var algoSecVar_2 = 'string'; //session ID
-                  */
-                  if(debugHitsTracer){ 
-                    console.log('algoTrace:', algoTrace); 
-                    console.log('algoSecVar_1:', algoSecVar_1); 
-                    console.log('algoSecVar_2:', algoSecVar_2); 
-                  }
+                  var algoTrace = true;
+                  var algoSecVar_1 = 'string'; 
+                  var algoSecVar_2 = 'string'; //session ID
+              */
+              if(debug){ 
+                console.log('algoTrace:', algoTrace); 
+                console.log('algoSecVar_1:', algoSecVar_1); 
+                console.log('algoSecVar_2:', algoSecVar_2); 
+              }
 
-                  if(!algoTrace){return false;}
-                  var secode = xMD5(currentUser.external_id+algoSecVar_2);
-                  if( secode !== algoSecVar_1){ return false; }
+              const router = api.container.lookup("router:main");
+              //if(debug){ console.log('router:', router); }
+              
+              router.on('willTransition', viewTrackingRequired);
 
-                  var encodedURL = encodeURIComponent(data.url);
+              let appEvents = api.container.lookup('service:app-events');
+              startPageTracking(router, appEvents);
 
-                  ajax(postTo, {
-                    type: "POST",
-                    headers: {
-                      'X-Origin': 'community.algosec.com',
-                      'Authorization': 'Bearer ' + secode,
-                      'Promote': 'Bearer ' + algoSecVar_2,
-                    },
-                    data: {
-                      action: the_action,
-                      q: encodedURL,
-                      xid: currentUser.external_id,                    
-                    },
-                    redirect: 'follow',
-                  })
-                    .catch((data)=>{
-                      if(debugHitsTracer){ console.log('catch hit trace exception', data);}
-                    })
-                    .finally(()=>{
-                        if(debugHitsTracer){ console.log('hit traced');}
-                    });
+              if(debug){
+                api.reopenWidget("search-menu", {
+                  /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
+                  traceTerm: null,
 
-                });                
+                  searchTermChanged(term, opts = {}) {                
+                    if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
+                    this.traceTerm = term;
+                    if(opts?.searchTopics ){
+                      if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
+                    }                
+                    return this._super(term, opts);
+                  },
 
-            }
-          });
+                  keyDown(e) {                                
+                    if (e.key === "Enter") {
+                      this.traceTerm = document.getElementById("search-term").value;
+                      if(debugSearchTracer){
+                        console.log('e.key', e.key);
+                        console.log('clicked Enter lets trace:', this.traceTerm);
+                      }
+                    }
+                    return this._super(e);
+                  },
+
+                });
+              }
+
+              appEvents.on('page:changed', data => {
+                var urlPrefix = "(/t/)"; // |/c/|/tag/ 
+                var searchPrefix = "(/search)";
+                var pattern = new RegExp('^' + urlPrefix);
+                var s_pattern = new RegExp('^' + searchPrefix);
+                var hasPrefix = pattern.test(data.url);
+                var hasSearchPrefix = s_pattern.test(data.url);
+                if(hasPrefix || hasSearchPrefix) {
+                    if(debugHitsTracer){ 
+                      console.log('url:', data.url); 
+                      console.log('hasSearchPrefix:', hasSearchPrefix); 
+                      console.log('hasPrefix:', hasPrefix); 
+                    }                                                              
+
+                      var the_action = (hasPrefix) ? 'community_hit':'community_search';                      
+
+                      if(!algoTrace){return false;}
+                      var secode = xMD5(currentUser.external_id+algoSecVar_2);
+                      if( secode !== algoSecVar_1){ return false; }
+
+                      var encodedURL = encodeURIComponent(data.url);
+
+                      ajax(postTo, {
+                        type: "POST",
+                        headers: {
+                          'X-Origin': 'community.algosec.com',
+                          'Authorization': 'Bearer ' + secode,
+                          'Promote': 'Bearer ' + algoSecVar_2,
+                        },
+                        data: {
+                          action: the_action,
+                          q: encodedURL,
+                          xid: currentUser.external_id,                    
+                        },
+                        redirect: 'follow',
+                      })
+                        .catch((data)=>{
+                          if(debugHitsTracer){ console.log('catch hit trace exception', data);}
+                        })
+                        .finally(()=>{
+                            if(debugHitsTracer){ console.log('hit traced');}
+                        });
+
+                }
+              });
+          }); 
 
           api.registerConnectorClass("above-site-header", "home-modal", {
             shouldRender() {
