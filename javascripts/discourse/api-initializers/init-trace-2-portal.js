@@ -117,6 +117,18 @@ export default apiInitializer("0.8", (api) => {
                         console.log('e.key', e.key);
                         console.log('clicked Enter lets trace:', this.traceTerm);
                       }
+                      if(!window.algoTrace){return false;}  
+                      var the_action = 'community_search';
+                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                      if( secode !== window.algoSecVar_1){ return false; }
+
+                      var encodedTerm = encodeURIComponent(term);
+
+                      traceThis(postTo, secode, window.algoSecVar_2, {
+                        action: the_action,
+                        q: encodedTerm,
+                        xid: currentUser.external_id,                    
+                      });
                     }
                     return this._super(e);
                   },
