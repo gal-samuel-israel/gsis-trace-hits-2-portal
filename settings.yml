@@ -12,6 +12,14 @@ enable_debug_for_all:
   type: bool
   default: false
   description: ""
+enable_debug_of_hits_tracer:
+  type: bool
+  default: false
+  description: "enable to see debug info for the hits tracer (Works only when debug for user|admin is enabled)"
+enable_debug_of_search_tracer:
+  type: bool
+  default: false
+  description: "enable to see debug info for the search tracer (Works only when debug for user|admin is enabled)"
 enable_tracing_only_for_admins:
   type: bool
   default: true

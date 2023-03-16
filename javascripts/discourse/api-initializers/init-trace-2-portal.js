@@ -21,8 +21,11 @@ export default apiInitializer("0.8", (api) => {
     var debug4All = settings.enable_debug_for_all;
     if(debug4All){ debug = true; }    
 
+    var debugHitsTracer = debug && settings.enable_debug_of_hits_tracer;
+    var debugSearchTracer = debug && settings.enable_debug_of_search_tracer;
+
     if(debug){          
-      console.log('trace-2-portal initializer:');
+      console.log('trace-2-portal initializer debug is ON:');
       console.log('admin:' + currentUser.admin); 
       console.log('currentUser.external_id:' + currentUser.external_id); 
     }
@@ -49,10 +52,10 @@ export default apiInitializer("0.8", (api) => {
               traceTerm: null,
 
               searchTermChanged(term, opts = {}) {                
-                if(debug){console.log('searchTermChanged', term, opts);}
+                if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
                 this.traceTerm = term;
                 if(opts?.searchTopics ){
-                  if(debug){console.log('clicked searchTopic lets trace:', this.traceTerm);}
+                  if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
                 }                
                 return this._super(term, opts);
               },
@@ -60,8 +63,10 @@ export default apiInitializer("0.8", (api) => {
               keyDown(e) {                                
                 if (e.key === "Enter") {
                   this.traceTerm = document.getElementById("search-term").value;
-                  if(debug){console.log('e.key', e.key);}
-                  if(debug){console.log('clicked Enter lets trace:', this.traceTerm);}
+                  if(debugSearchTracer){
+                    console.log('e.key', e.key);
+                    console.log('clicked Enter lets trace:', this.traceTerm);
+                  }
                 }
                 return this._super(e);
               },
@@ -77,15 +82,17 @@ export default apiInitializer("0.8", (api) => {
             var hasPrefix = pattern.test(data.url);
             var hasSearchPrefix = s_pattern.test(data.url);
             if(hasPrefix || hasSearchPrefix) {
-                if(debug){ console.log('url:', data.url); }
+                if(debugHitsTracer){ 
+                  console.log('url:', data.url); 
+                  console.log('hasSearchPrefix:', hasSearchPrefix); 
+                  console.log('hasPrefix:', hasPrefix); 
+                }
                 
                 var postTo = postToHost +'/user/community/comtr-action.php';
                 var widget = postToHost +'/user/community/widget.js';
                 loadScript(widget).then((resp) => {
-                  if(debug){ 
-                    console.log('widget: loaded'); 
-                    console.log('hasSearchPrefix:', hasSearchPrefix); 
-                    console.log('hasPrefix:', hasPrefix); 
+                  if(debugHitsTracer){ 
+                    console.log('widget.js: loaded');                     
                   }
 
                   var the_action = (hasPrefix) ? 'community_hit':'community_search';
@@ -95,6 +102,12 @@ export default apiInitializer("0.8", (api) => {
                       var algoSecVar_1 = 'string'; 
                       var algoSecVar_2 = 'string'; //session ID
                   */
+                  if(debugHitsTracer){ 
+                    console.log('algoTrace:', algoTrace); 
+                    console.log('algoSecVar_1:', algoSecVar_1); 
+                    console.log('algoSecVar_2:', algoSecVar_2); 
+                  }
+
                   if(!algoTrace){return false;}
                   var secode = xMD5(currentUser.external_id+algoSecVar_2);
                   if( secode !== algoSecVar_1){ return false; }
@@ -116,10 +129,10 @@ export default apiInitializer("0.8", (api) => {
                     redirect: 'follow',
                   })
                     .catch((data)=>{
-                      if(debug){ console.log('catch', data);}
+                      if(debugHitsTracer){ console.log('catch hit trace exception', data);}
                     })
                     .finally(()=>{
-                        if(debug){ console.log('done');}
+                        if(debugHitsTracer){ console.log('hit traced');}
                     });
 
                 });                

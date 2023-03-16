@@ -1,3 +1,4 @@
+/*
 import { popupAjaxError } from "discourse/lib/ajax-error";
 import { ajax } from "discourse/lib/ajax";
 import showModal from "discourse/lib/show-modal";
@@ -20,7 +21,7 @@ const xMD5=function($){function _($,_){return $<<_|$>>>32-_}function x($,_){var 
 export default Component.extend({
   router: service(),  
 
-  /* Object local params */
+  //Object local params
   
   debug: false,
   debugForAdmins: null,
@@ -59,7 +60,7 @@ export default Component.extend({
       this.destroy();
       return false;
     }
-    
+  */
     //call AJAX
     /*
     ajax(`/u/${this.currentUser.username}.json`)
@@ -77,6 +78,7 @@ export default Component.extend({
 
       }).catch(popupAjaxError);      
     */  
+   /*
   },  
   
   @discourseComputed("router.currentRouteName")
@@ -155,3 +157,4 @@ export default Component.extend({
 
 
 });
+*/
