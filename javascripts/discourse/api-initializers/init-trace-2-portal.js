@@ -122,7 +122,7 @@ export default apiInitializer("0.8", (api) => {
                       var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
                       if( secode !== window.algoSecVar_1){ return false; }
 
-                      var encodedTerm = encodeURIComponent(term);
+                      var encodedTerm = encodeURIComponent(this.traceTerm);
 
                       traceThis(postTo, secode, window.algoSecVar_2, {
                         action: the_action,
