@@ -74,7 +74,7 @@ export default apiInitializer("0.8", (api) => {
                 console.log('algoSecVar_2:', algoSecVar_2); 
               }              
 
-              if(debug){
+              
                 api.reopenWidget("search-menu", {
                   /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
                   traceTerm: null,                  
@@ -127,7 +127,7 @@ export default apiInitializer("0.8", (api) => {
                   },
 
                 });
-              }
+              
 
               const router = api.container.lookup("router:main");
               router.on('willTransition', viewTrackingRequired);
