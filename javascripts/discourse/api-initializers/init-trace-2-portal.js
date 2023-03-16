@@ -87,7 +87,7 @@ export default apiInitializer("0.8", (api) => {
                   traceTerm: null,
                   algoTrace: window.algoTrace, 
                   algoSecVar_1: window.algoSecVar_1,
-                  algosecVar_2: window.algosecVar_2,
+                  algosecVar_2: window.algoSecVar_2,
 
                   searchTermChanged(term, opts = {}) {  
                     if(!this.algoTrace){return false;}              
@@ -102,7 +102,7 @@ export default apiInitializer("0.8", (api) => {
 
                       var encodedTerm = encodeURIComponent(term);
 
-                      traceThis(postTo, secode, this.algosecVar_2, {
+                      traceThis(postTo, secode, this.window.algoSecVar_2, {
                         action: the_action,
                         q: encodedTerm,
                         xid: currentUser.external_id,                    
@@ -152,7 +152,7 @@ export default apiInitializer("0.8", (api) => {
 
                       var encodedURL = encodeURIComponent(data.url);
 
-                      traceThis(postTo, secode, window.algosecVar_2, {
+                      traceThis(postTo, secode, window.algoSecVar_2, {
                         action: the_action,
                         q: encodedURL,
                         xid: currentUser.external_id,                    
