@@ -38,9 +38,30 @@ export default apiInitializer("0.8", (api) => {
           if(debug){ console.log('trace active'); }
           
           const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
-
           var postTo = postToHost +'/user/community/comtr-action.php';
           var widget = postToHost +'/user/community/widget.js';
+
+          const traceThis = function(postTo, secode, algoSecVar_2, dataObj){
+
+            ajax(postTo, {
+              type: "POST",
+              headers: {
+                'X-Origin': 'community.algosec.com',
+                'Authorization': 'Bearer ' + secode,
+                'Promote': 'Bearer ' + algoSecVar_2,
+              },
+              data: dataObj,
+              redirect: 'follow',
+            })
+              .catch((data)=>{
+                  if(debug){ console.log('trace exception', data);}
+              })
+              .finally(()=>{
+                  if(debug){ console.log('traced '+dataObj.action);}
+              });
+
+          };
+
           loadScript(widget).then((resp) => {
             if(debug){ console.log('widget.js: loaded'); }
               /*
@@ -56,9 +77,8 @@ export default apiInitializer("0.8", (api) => {
               }
 
               const router = api.container.lookup("router:main");
-              //if(debug){ console.log('router:', router); }
-              
               router.on('willTransition', viewTrackingRequired);
+              //if(debug){ console.log('router:', router); }              
 
               let appEvents = api.container.lookup('service:app-events');
               startPageTracking(router, appEvents);
@@ -68,12 +88,27 @@ export default apiInitializer("0.8", (api) => {
                   /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
                   traceTerm: null,
 
-                  searchTermChanged(term, opts = {}) {                
+                  searchTermChanged(term, opts = {}) {  
+                    if(!algoTrace){return false;}              
                     if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
                     this.traceTerm = term;
                     if(opts?.searchTopics ){
                       if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
-                    }                
+
+                      var the_action = 'community_search';
+                      var secode = xMD5(currentUser.external_id+algoSecVar_2);
+                      if( secode !== algoSecVar_1){ return false; }
+
+                      var encodedTerm = encodeURIComponent(term);
+
+                      traceThis(postTo, secode, algosecVar_2, {
+                        action: the_action,
+                        q: encodedTerm,
+                        xid: currentUser.external_id,                    
+                      });
+
+                    }                                        
+
                     return this._super(term, opts);
                   },
 
@@ -113,27 +148,11 @@ export default apiInitializer("0.8", (api) => {
 
                       var encodedURL = encodeURIComponent(data.url);
 
-                      ajax(postTo, {
-                        type: "POST",
-                        headers: {
-                          'X-Origin': 'community.algosec.com',
-                          'Authorization': 'Bearer ' + secode,
-                          'Promote': 'Bearer ' + algoSecVar_2,
-                        },
-                        data: {
-                          action: the_action,
-                          q: encodedURL,
-                          xid: currentUser.external_id,                    
-                        },
-                        redirect: 'follow',
-                      })
-                        .catch((data)=>{
-                          if(debugHitsTracer){ console.log('catch hit trace exception', data);}
-                        })
-                        .finally(()=>{
-                            if(debugHitsTracer){ console.log('hit traced');}
-                        });
-
+                      traceThis(postTo, secode, algosecVar_2, {
+                        action: the_action,
+                        q: encodedURL,
+                        xid: currentUser.external_id,                    
+                      });
                 }
               });
           }); 
