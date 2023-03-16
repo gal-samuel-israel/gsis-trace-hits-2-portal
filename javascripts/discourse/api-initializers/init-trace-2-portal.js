@@ -41,9 +41,8 @@ export default apiInitializer("0.8", (api) => {
           var postTo = postToHost +'/user/community/comtr-action.php';
           var widget = postToHost +'/user/community/widget.js';
 
-          const traceThis = function(postTo, secode, algoSecVar_2, dataObj){
-
-            ajax(postTo, {
+          const traceThis = function(postToURL, secode, algoSecVar_2, dataObj){
+            ajax(postToURL, {
               type: "POST",
               headers: {
                 'X-Origin': 'community.algosec.com',
@@ -59,7 +58,6 @@ export default apiInitializer("0.8", (api) => {
               .finally(()=>{
                   if(debug){ console.log('traced '+dataObj.action);}
               });
-
           };
 
           loadScript(widget).then((resp) => {
@@ -87,21 +85,24 @@ export default apiInitializer("0.8", (api) => {
                 api.reopenWidget("search-menu", {
                   /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
                   traceTerm: null,
+                  algoTrace: window.algoTrace, 
+                  algoSecVar_1: window.algoSecVar_1,
+                  algosecVar_2: window.algosecVar_2,
 
                   searchTermChanged(term, opts = {}) {  
-                    if(!algoTrace){return false;}              
+                    if(!this.algoTrace){return false;}              
                     if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
                     this.traceTerm = term;
                     if(opts?.searchTopics ){
                       if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
 
                       var the_action = 'community_search';
-                      var secode = xMD5(currentUser.external_id+algoSecVar_2);
-                      if( secode !== algoSecVar_1){ return false; }
+                      var secode = xMD5(currentUser.external_id + this.algoSecVar_2);
+                      if( secode !== this.algoSecVar_1){ return false; }
 
                       var encodedTerm = encodeURIComponent(term);
 
-                      traceThis(postTo, secode, algosecVar_2, {
+                      traceThis(postTo, secode, this.algosecVar_2, {
                         action: the_action,
                         q: encodedTerm,
                         xid: currentUser.external_id,                    
@@ -137,18 +138,21 @@ export default apiInitializer("0.8", (api) => {
                     if(debugHitsTracer){ 
                       console.log('url:', data.url); 
                       console.log('hasSearchPrefix:', hasSearchPrefix); 
-                      console.log('hasPrefix:', hasPrefix); 
+                      console.log('hasPrefix:', hasPrefix);
+                      console.log('algoTrace:', window.algoTrace); 
+                      console.log('algoSecVar_1:', window.algoSecVar_1); 
+                      console.log('algoSecVar_2:', window.algoSecVar_2); 
                     }                                                              
 
                       var the_action = (hasPrefix) ? 'community_hit':'community_search';                      
 
-                      if(!algoTrace){return false;}
-                      var secode = xMD5(currentUser.external_id+algoSecVar_2);
-                      if( secode !== algoSecVar_1){ return false; }
+                      if(!window.algoTrace){return false;}
+                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                      if( secode !== window.algoSecVar_1){ return false; }
 
                       var encodedURL = encodeURIComponent(data.url);
 
-                      traceThis(postTo, secode, algosecVar_2, {
+                      traceThis(postTo, secode, window.algosecVar_2, {
                         action: the_action,
                         q: encodedURL,
                         xid: currentUser.external_id,                    
