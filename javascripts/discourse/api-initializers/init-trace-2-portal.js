@@ -84,25 +84,22 @@ export default apiInitializer("0.8", (api) => {
               if(debug){
                 api.reopenWidget("search-menu", {
                   /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
-                  traceTerm: null,
-                  algoTrace: window.algoTrace, 
-                  algoSecVar_1: window.algoSecVar_1,
-                  algosecVar_2: window.algoSecVar_2,
+                  traceTerm: null,                  
 
                   searchTermChanged(term, opts = {}) {  
-                    if(!this.algoTrace){return false;}              
+                    if(!window.algoTrace){return false;}              
                     if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
                     this.traceTerm = term;
                     if(opts?.searchTopics ){
                       if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
 
                       var the_action = 'community_search';
-                      var secode = xMD5(currentUser.external_id + this.algoSecVar_2);
-                      if( secode !== this.algoSecVar_1){ return false; }
+                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                      if( secode !== window.algoSecVar_1){ return false; }
 
                       var encodedTerm = encodeURIComponent(term);
 
-                      traceThis(postTo, secode, this.window.algoSecVar_2, {
+                      traceThis(postTo, secode, window.algoSecVar_2, {
                         action: the_action,
                         q: encodedTerm,
                         xid: currentUser.external_id,                    
