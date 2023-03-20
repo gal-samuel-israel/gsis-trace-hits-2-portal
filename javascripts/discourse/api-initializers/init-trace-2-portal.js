@@ -41,6 +41,32 @@ export default apiInitializer("0.8", (api) => {
           var postTo = postToHost +'/user/community/comtr-action.php';
           var widget = postToHost +'/user/community/widget.js';
 
+          const router = api.container.lookup("router:main");
+
+          const isUrlForTracing = function(url){
+                var urlPrefix = "(/t/)"; // |/c/|/tag/ 
+                var searchPrefix = "(/search)";
+                var pattern = new RegExp('^' + urlPrefix);
+                var s_pattern = new RegExp('^' + searchPrefix);
+                var hasPrefix = pattern.test(url);
+                var hasSearchPrefix = s_pattern.test(url);
+
+                if(debugHitsTracer){ 
+                  console.log('url:', url); 
+                  console.log('hasSearchPrefix:', hasSearchPrefix); 
+                  console.log('hasPrefix:', hasPrefix);
+                  console.log('algoTrace:', window.algoTrace); 
+                  console.log('algoSecVar_1:', window.algoSecVar_1); 
+                  console.log('algoSecVar_2:', window.algoSecVar_2); 
+                } 
+
+                return {
+                  'shouldTrace':(hasPrefix || hasSearchPrefix),
+                  'hasPrefix': hasPrefix,
+                  'hasSearchPrefix': hasSearchPrefix,
+                };
+          };
+
           const traceThis = function(postToURL, secode, algoSecVar_2, dataObj){
             ajax(postToURL, {
               type: "POST",
@@ -62,18 +88,17 @@ export default apiInitializer("0.8", (api) => {
 
           loadScript(widget).then((resp) => {
             if(debug){ console.log('widget.js: loaded'); }
-              /*
-                  if loadScript is successful it sets:
-                  var algoTrace = true;
-                  var algoSecVar_1 = 'string'; 
-                  var algoSecVar_2 = 'string'; //session ID
-              */
-              if(debug){ 
-                console.log('algoTrace:', algoTrace); 
-                console.log('algoSecVar_1:', algoSecVar_1); 
-                console.log('algoSecVar_2:', algoSecVar_2); 
-              }              
-
+                /*
+                    if loadScript is successful it sets:
+                    var algoTrace = true;
+                    var algoSecVar_1 = 'string'; 
+                    var algoSecVar_2 = 'string'; //session ID
+                */
+                if(debug){ 
+                  console.log('algoTrace:', algoTrace); 
+                  console.log('algoSecVar_1:', algoSecVar_1); 
+                  console.log('algoSecVar_2:', algoSecVar_2); 
+                }
               
                 api.reopenWidget("search-menu", {
                   /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
@@ -128,47 +153,51 @@ export default apiInitializer("0.8", (api) => {
 
                 });
               
+                router.on('willTransition', viewTrackingRequired);
+                //if(debug){ console.log('router:', router); }              
 
-              const router = api.container.lookup("router:main");
-              router.on('willTransition', viewTrackingRequired);
-              //if(debug){ console.log('router:', router); }              
+                let appEvents = api.container.lookup('service:app-events');
+                startPageTracking(router, appEvents);
 
-              let appEvents = api.container.lookup('service:app-events');
-              startPageTracking(router, appEvents);
+                appEvents.on('page:changed', data => {                
+                    var traceCheck = isUrlForTracing(data.url);
+                    if(traceCheck.shouldTrace) {                                                                                 
+                        var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                      
 
-              appEvents.on('page:changed', data => {
-                var urlPrefix = "(/t/)"; // |/c/|/tag/ 
-                var searchPrefix = "(/search)";
-                var pattern = new RegExp('^' + urlPrefix);
-                var s_pattern = new RegExp('^' + searchPrefix);
-                var hasPrefix = pattern.test(data.url);
-                var hasSearchPrefix = s_pattern.test(data.url);
-                if(hasPrefix || hasSearchPrefix) {
-                    if(debugHitsTracer){ 
-                      console.log('url:', data.url); 
-                      console.log('hasSearchPrefix:', hasSearchPrefix); 
-                      console.log('hasPrefix:', hasPrefix);
-                      console.log('algoTrace:', window.algoTrace); 
-                      console.log('algoSecVar_1:', window.algoSecVar_1); 
-                      console.log('algoSecVar_2:', window.algoSecVar_2); 
-                    }                                                              
+                        if(!window.algoTrace){return false;}
+                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( secode !== window.algoSecVar_1){ return false; }
 
-                      var the_action = (hasPrefix) ? 'community_hit':'community_search';                      
+                        var encodedURL = encodeURIComponent(data.url);
 
-                      if(!window.algoTrace){return false;}
-                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                      if( secode !== window.algoSecVar_1){ return false; }
+                        traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: the_action,
+                          q: encodedURL,
+                          xid: currentUser.external_id,                    
+                        });
+                    }
+                });
 
-                      var encodedURL = encodeURIComponent(data.url);
+                //will run once (or first page loaf or a page refresh)
+                if(window.algoTrace){
+                    var onloadTrace = isUrlForTracing(window.location.pathname);
+                    if(onloadTrace.shouldTrace) {
+                        var onLoadAction = (onloadTrace.hasPrefix) ? 'community_hit':'community_search';                      
+                        var onLoadSecode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( onLoadSecode == window.algoSecVar_1){
+                            var onLoadEncodedURL = encodeURIComponent(window.location.pathname);
 
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                        action: the_action,
-                        q: encodedURL,
-                        xid: currentUser.external_id,                    
-                      });
+                            traceThis(postTo, onLoadSecode, window.algoSecVar_2, {
+                              action: onLoadAction,
+                              q: onLoadEncodedURL,
+                              xid: currentUser.external_id,                    
+                            });
+                        }
+                    }
                 }
-              });
+
           }); 
+
           /*
           api.registerConnectorClass("above-site-header", "home-modal", {
             shouldRender() {
