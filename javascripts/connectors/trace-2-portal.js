@@ -1,4 +1,5 @@
-import discourseComputed from "discourse-common/utils/decorators";
+//DEPRECATED//import discourseComputed from "discourse-common/utils/decorators";
+import { computed } from "@ember/object";
 import { inject as service } from "@ember/service";
 
 export default {
@@ -12,9 +13,13 @@ export default {
       debug4All: false,    
       traceOnlyAdmins:false, 
 
-      @discourseComputed("router.currentRouteName")
-      tracing2Portal(currentRouteName) {
-
+      //DEPRECATED//@discourseComputed("router.currentRouteName")
+      
+      //DEPRECATED
+      //@observes("router.currentRouteName")
+      //tracing2Portal(currentRouteName) {
+      
+      tracing2Portal: computed("router.currentRouteName", function() {
         this.traceOnlyAdmins = settings?.enable_tracing_only_for_admins; //from settings.yml
         this.debugForAdmins = settings?.enable_debug_for_admins; //from settings.yml
         this.debug4All = settings?.enable_debug_for_all; //from settings.yml    
@@ -32,7 +37,7 @@ export default {
             console.log('currentRouteName: ', currentRouteName);
         }
         
-      },
+      }),
     });
   },
 };
