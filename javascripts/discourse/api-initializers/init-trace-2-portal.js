@@ -41,7 +41,7 @@ export default apiInitializer("0.8", (api) => {
           var postTo = postToHost +'/user/community/comtr-action.php';
           var widget = postToHost +'/user/community/widget.js';
 
-          api.inject('component', 'router', 'router:main');
+          //api.inject('component', 'router', 'router:main');
           const router = api.container.lookup('router:main');          
 
           const isUrlForTracing = function(url){
