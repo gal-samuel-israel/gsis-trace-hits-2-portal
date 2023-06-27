@@ -1,4 +1,3 @@
-//DEPRECATED//import discourseComputed from "discourse-common/utils/decorators";
 import { computed } from "@ember/object";
 import { inject as service } from "@ember/service";
 
@@ -11,13 +10,7 @@ export default {
       debugFocusTrap: false,
       debugForUsers: false,
       debug4All: false,    
-      traceOnlyAdmins:false, 
-
-      //DEPRECATED//@discourseComputed("router.currentRouteName")
-      
-      //DEPRECATED
-      //@observes("router.currentRouteName")
-      //tracing2Portal(currentRouteName) {
+      traceOnlyAdmins:false,
       
       tracing2Portal: computed("router.currentRouteName", function() {
         this.traceOnlyAdmins = settings?.enable_tracing_only_for_admins; //from settings.yml
