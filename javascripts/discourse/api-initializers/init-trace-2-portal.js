@@ -41,7 +41,8 @@ export default apiInitializer("0.8", (api) => {
           var postTo = postToHost +'/user/community/comtr-action.php';
           var widget = postToHost +'/user/community/widget.js';
 
-          const router = api.container.lookup("router:main");
+          api.inject('component', 'router', 'router:main');
+          const router = api.container.lookup('router:main');          
 
           const isUrlForTracing = function(url){
                 var urlPrefix = "(/t/)"; // |/c/|/tag/ 
@@ -153,7 +154,8 @@ export default apiInitializer("0.8", (api) => {
 
                 });
               
-                router.on('willTransition', viewTrackingRequired);
+                //DEPRECATED//router.on('willTransition', viewTrackingRequired);
+                router.on('routeWillChange', viewTrackingRequired);
                 //if(debug){ console.log('router:', router); }              
 
                 let appEvents = api.container.lookup('service:app-events');
