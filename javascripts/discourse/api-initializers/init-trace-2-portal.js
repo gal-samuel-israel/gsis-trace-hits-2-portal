@@ -263,9 +263,12 @@ export default apiInitializer("0.8", (api) => {
         // api.ajax({ ... });
       }
     
-      // Listen for the routeWillChange event
-      const appEvents = api.container.lookup("service:app-events");
-      appEvents.on("routeWillChange", onPageLoad);
+      // Use window.onload event to wait for the entire page to load
+      if (document.readyState === "complete") {
+        onPageLoad();
+      } else {
+        window.onload = onPageLoad;
+      }
 
     }
 
