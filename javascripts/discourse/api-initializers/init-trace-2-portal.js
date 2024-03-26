@@ -14,9 +14,7 @@ export default apiInitializer("0.8", (api) => {
     var debug = currentUser.admin && settings.enable_debug_for_admins;
     var debugForUsers = settings.enable_debug_for_user_ids;
     var debugForIDs = (debugForUsers) ? debugForUsers.split("|") : null;
-    if (debugForIDs && debugForIDs.includes(currentUser.id.toString())) {
-      debug = true;
-    }
+    if (debugForIDs && debugForIDs.includes(currentUser.id.toString())) { debug = true; }
 
     var debug4All = settings.enable_debug_for_all;
     if(debug4All){ debug = true; }    
@@ -35,11 +33,52 @@ export default apiInitializer("0.8", (api) => {
     blockTrace = (traceOnlyToAdmins && !isAdmin);
     
     if(!blockTrace){
-          if(debug){ console.log('trace active'); }
+
+      if(debug){ console.log('trace active'); }        
+      const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
+      var postTo = postToHost +'/user/community/comtr-action.php';
+      var widget = postToHost +'/user/community/widget.js';
+      
+      /* START TRIAL */
+      function loadWidgetScript() {
+        return new Promise((resolve, reject) => {
+          const widgetScriptUrl = widget; // Replace with the actual URL
+          loadScript(widgetScriptUrl)
+            .then(() => {
+              // Widget script loaded successfully
+              console.log('triel success widget.js: loaded');
+              resolve();
+            })
+            .catch((error) => {
+              // Error loading widget script
+              reject(error);
+            });
+        });
+      }
+
+      if(debug){ 
+        loadWidgetScript()
+        .then(() => {
+          // Widget script loaded successfully
+          // Now you can safely use the search-menu widget
+          api.reopenWidget("search-menu", {
+            // Your customization options for the search-menu widget
+            keyDown(e) {
+              console.log('overriding keyDown:' + e.key);
+              return this._super(e);
+            }
+
+          });
+        })
+        .catch((error) => {
+          // Error loading widget script
+          console.error("Error loading widget script:", error);
+        });
+      }
+
+      /* END TRIAL */
           
-          const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
-          var postTo = postToHost +'/user/community/comtr-action.php';
-          var widget = postToHost +'/user/community/widget.js';
+          
           
           const router = api.container.lookup('router:main');          
 
@@ -87,7 +126,6 @@ export default apiInitializer("0.8", (api) => {
           };
 
           loadScript(widget).then((resp) => {
-            if(debug){ console.log('widget.js: loaded'); }
                 /*
                     if loadScript is successful it sets:
                     var algoTrace = true;
@@ -95,10 +133,10 @@ export default apiInitializer("0.8", (api) => {
                     var algoSecVar_2 = 'string'; //session ID
                 */
                 if(debug){ 
+                  console.log('widget.js: loaded');
                   console.log('algoTrace:', algoTrace); 
                   console.log('algoSecVar_1:', algoSecVar_1); 
-                  console.log('algoSecVar_2:', algoSecVar_2); 
-                
+                  console.log('algoSecVar_2:', algoSecVar_2);                 
               
                   console.log('trying reopenWidget search-term');
                   api.reopenWidget("search-term", {
@@ -214,6 +252,23 @@ export default apiInitializer("0.8", (api) => {
           */
    
     }
+
+
+    if(debug){
+
+      function onPageLoad() {
+        // Your API requests or any other logic can go here
+        console.log("Page components have finished loading.");
+        // Example API request:
+        // api.ajax({ ... });
+      }
+    
+      // Listen for the routeWillChange event
+      const appEvents = api.container.lookup("service:app-events");
+      appEvents.on("routeWillChange", onPageLoad);
+
+    }
+
 
   }  
 
