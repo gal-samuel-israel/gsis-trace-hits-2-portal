@@ -98,61 +98,67 @@ export default apiInitializer("0.8", (api) => {
                   console.log('algoTrace:', algoTrace); 
                   console.log('algoSecVar_1:', algoSecVar_1); 
                   console.log('algoSecVar_2:', algoSecVar_2); 
-                }
+                
               
-                api.reopenWidget("search-menu", {
-                  /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
-                  traceTerm: null,                  
+                  console.log('trying reopenWidget search-term');
+                  api.reopenWidget("search-term", {
 
-                  searchTermChanged(term, opts = {}) {  
-                    if(!window.algoTrace){return false;}              
-                    if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
-                    this.traceTerm = term;
-                    if(opts?.searchTopics ){
-                      if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
+                  });
+                  console.log('trying reopenWidget search-menu');
+                  api.reopenWidget("search-menu", {
+                    /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
+                    traceTerm: null,                  
 
-                      var the_action = 'community_search';
-                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                      if( secode !== window.algoSecVar_1){ return false; }
+                    searchTermChanged(term, opts = {}) {  
+                      if(!window.algoTrace){return false;}              
+                      if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
+                      this.traceTerm = term;
+                      if(opts?.searchTopics ){
+                        if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
 
-                      var encodedTerm = encodeURIComponent(term);
+                        var the_action = 'community_search';
+                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( secode !== window.algoSecVar_1){ return false; }
 
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                        action: the_action,
-                        q: encodedTerm,
-                        xid: currentUser.external_id,                    
-                      });
+                        var encodedTerm = encodeURIComponent(term);
 
-                    }                                        
+                        traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: the_action,
+                          q: encodedTerm,
+                          xid: currentUser.external_id,                    
+                        });
 
-                    return this._super(term, opts);
-                  },
+                      }                                        
 
-                  keyDown(e) {                                
-                    if (e.key === "Enter") {
-                      this.traceTerm = document.getElementById("search-term").value;
-                      if(debugSearchTracer){
-                        console.log('e.key', e.key);
-                        console.log('clicked Enter lets trace:', this.traceTerm);
+                      return this._super(term, opts);
+                    },
+
+                    keyDown(e) {                                
+                      if (e.key === "Enter") {
+                        this.traceTerm = document.getElementById("search-term").value;
+                        if(debugSearchTracer){
+                          console.log('e.key', e.key);
+                          console.log('clicked Enter lets trace:', this.traceTerm);
+                        }
+                        if(!window.algoTrace){return false;}  
+                        var the_action = 'community_search';
+                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( secode !== window.algoSecVar_1){ return false; }
+
+                        var encodedTerm = encodeURIComponent(this.traceTerm);
+
+                        traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: the_action,
+                          q: encodedTerm,
+                          xid: currentUser.external_id,                    
+                        });
                       }
-                      if(!window.algoTrace){return false;}  
-                      var the_action = 'community_search';
-                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                      if( secode !== window.algoSecVar_1){ return false; }
+                      return this._super(e);
+                    },
 
-                      var encodedTerm = encodeURIComponent(this.traceTerm);
-
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                        action: the_action,
-                        q: encodedTerm,
-                        xid: currentUser.external_id,                    
-                      });
-                    }
-                    return this._super(e);
-                  },
-
-                });
+                  });
               
+                }
                 //DEPRECATED//router.on('willTransition', viewTrackingRequired);
                 router.on('routeWillChange', viewTrackingRequired);
                 //if(debug){ console.log('router:', router); }              
