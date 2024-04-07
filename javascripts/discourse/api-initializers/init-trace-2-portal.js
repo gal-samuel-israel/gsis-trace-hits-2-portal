@@ -143,6 +143,7 @@ export default apiInitializer("1.6", (api) => {
                   api.reopenWidget("search-term", {
 
                   });
+                }
                   console.log('trying reopenWidget search-menu');
                   api.reopenWidget("search-menu", {
                     /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
@@ -197,7 +198,7 @@ export default apiInitializer("1.6", (api) => {
 
                   });
               
-                }
+                
                 //DEPRECATED//router.on('willTransition', viewTrackingRequired);
                 router.on('routeWillChange', viewTrackingRequired);
                 //if(debug){ console.log('router:', router); }              
