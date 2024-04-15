@@ -131,15 +131,9 @@ export default apiInitializer("1.6", (api) => {
                     console.log('widget.js: loaded');
                     console.log('algoTrace:', algoTrace); 
                     console.log('algoSecVar_1:', algoSecVar_1); 
-                    console.log('algoSecVar_2:', algoSecVar_2);                 
-                    
-                    /* NOT WORKING with error: 
-                    console.log('trying reopenWidget search-term');
-                    api.reopenWidget("search-term", {
+                    console.log('algoSecVar_2:', algoSecVar_2);                                    
 
-                    });
-                    */                    
-
+                    /* this call back is not addequate for tracing as it catches all words one by one */
                     api.addSearchResultsCallback((results) => {
                         const traceTerm = results.grouped_search_result.term;
                         if(debug){
