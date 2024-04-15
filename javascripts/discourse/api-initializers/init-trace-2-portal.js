@@ -235,12 +235,12 @@ export default apiInitializer("1.6", (api) => {
 
                 if(debug){
                   // Add an event listener for all events emitted by appEvents
-                  appEvents.on('event', eventName => {
-                    // Handle the event here
-                    console.log('Event captured:', eventName);
+                  appEvents.on('all', (eventName, ...eventData) => {
+                    // Handle the event name and event data here
+                    console.log('Event captured:', eventName, eventData);
                   });
                 }
-                
+
                 appEvents.on('page:changed', data => {                
                     var traceCheck = isUrlForTracing(data.url);
                     if(traceCheck.shouldTrace) {                                                                                 
