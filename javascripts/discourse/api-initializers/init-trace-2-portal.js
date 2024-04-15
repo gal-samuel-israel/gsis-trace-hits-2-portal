@@ -138,50 +138,36 @@ export default apiInitializer("1.6", (api) => {
                     api.reopenWidget("search-term", {
 
                     });
-                    */
+                    */                    
 
-                    // debounce to capture full sentences in the search
-                    const debounce = (func, delay)=> {
-                      let timeoutId;                      
-                      return function(...args) {
-                          clearTimeout(timeoutId);
-                          timeoutId = setTimeout(() => {
-                              func.apply(this, args);
-                          }, delay);
-                      };
-                    }
-
-                    // Wrap your API callback in a debounced function
-                    const debouncedSearchResultsCallback = debounce((results) => {
-                          const traceTerm = results.grouped_search_result.term;
-                          if(debug){
-                            //console.log('searchResults: ', results);
-                            console.log('traceTerm:', traceTerm);
-                          }
-                          if (lastTrace === traceTerm){
-                            if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
-                            return results;
-                          }
-                          if(!window.algoTrace){return results;} 
-
-                          //trace to portal
-                          var the_action = 'community_search';
-                          var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                          if( secode !== window.algoSecVar_1){ return false; }
-
-                          var encodedTerm = encodeURIComponent(traceTerm);
-                          
-                          traceThis(postTo, secode, window.algoSecVar_2, {
-                            action: the_action,
-                            q: encodedTerm,
-                            xid: currentUser.external_id,                    
-                          });
-                          lastTrace = traceTerm;
-
+                    api.addSearchResultsCallback((results) => {
+                        const traceTerm = results.grouped_search_result.term;
+                        if(debug){
+                          //console.log('searchResults: ', results);
+                          console.log('traceTerm:', traceTerm);
+                        }
+                        if (lastTrace === traceTerm){
+                          if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
                           return results;
-                    }, 1500); // Adjust the delay time (in milliseconds) as needed
+                        }
+                        if(!window.algoTrace){return results;} 
 
-                    api.addSearchResultsCallback(debouncedSearchResultsCallback);
+                        //trace to portal
+                        var the_action = 'community_search';
+                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( secode !== window.algoSecVar_1){ return false; }
+
+                        var encodedTerm = encodeURIComponent(traceTerm);
+                        
+                        traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: the_action,
+                          q: encodedTerm,
+                          xid: currentUser.external_id,                    
+                        });
+                        lastTrace = traceTerm;
+
+                        return results;
+                    });
                 } // end if(debug)
 
                 /* Add a callback for onKeyDown in search menu */
