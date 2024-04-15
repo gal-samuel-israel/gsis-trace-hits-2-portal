@@ -138,15 +138,27 @@ export default apiInitializer("1.6", (api) => {
                   console.log('algoTrace:', algoTrace); 
                   console.log('algoSecVar_1:', algoSecVar_1); 
                   console.log('algoSecVar_2:', algoSecVar_2);                 
-              
+                  
+                  /* NOT WORKING with wrror: 
                   console.log('trying reopenWidget search-term');
                   api.reopenWidget("search-term", {
 
                   });
+                  */
+                  console.log('adding searchMenuOnKeyDownCallback'); 
+                  api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
+                    console.log('onKeyDownCallback', event);
+                    if (searchMenu.term === "stop") {
+                      return false;
+                    }
+                  });
+                    
+
                 }
+                /*
                   console.log('trying reopenWidget search-menu');
                   api.reopenWidget("search-menu", {
-                    /* override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js */              
+                    //override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js
                     traceTerm: null,                  
 
                     searchTermChanged(term, opts = {}) {  
@@ -197,7 +209,7 @@ export default apiInitializer("1.6", (api) => {
                     },
 
                   });
-              
+                  */
                 
                 //DEPRECATED//router.on('willTransition', viewTrackingRequired);
                 router.on('routeWillChange', viewTrackingRequired);
