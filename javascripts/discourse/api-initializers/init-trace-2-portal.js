@@ -143,7 +143,7 @@ export default apiInitializer("1.6", (api) => {
                     api.addSearchResultsCallback((results) => {
                         const traceTerm = results.grouped_search_result.term;
                         if(debug){
-                          //console.log('searchResults: ', results);
+                          console.log('searchResults: ', results);
                           console.log('traceTerm:', traceTerm);
                         }
                         if (lastTrace === traceTerm){
