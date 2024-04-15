@@ -146,7 +146,7 @@ export default apiInitializer("1.6", (api) => {
                         //console.log('searchResults: ', results);
                         console.log('traceTerm:', traceTerm);
                       }
-                      if (lastTrace !== null || lastTrace === traceTerm){
+                      if (lastTrace === traceTerm){
                         if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
                         return results;
                       }
@@ -184,7 +184,7 @@ export default apiInitializer("1.6", (api) => {
                           console.log('event.key', event.key);
                           console.log('clicked Enter lets trace:', traceTerm);
                         }
-                        if (lastTrace !== null || lastTrace === traceTerm){
+                        if (lastTrace === traceTerm){
                           if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
                           return false;
                         }
