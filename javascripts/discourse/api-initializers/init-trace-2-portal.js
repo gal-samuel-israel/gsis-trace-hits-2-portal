@@ -136,6 +136,12 @@ export default apiInitializer("1.6", (api) => {
 
                   });
                   */
+
+                  api.addSearchResultsCallback((results) => {
+                      console.log(results);
+                      return results;
+                  });
+                  
                   /* Add a callback for onKeyDown in search menu */
                   api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
                       console.log('onKeyDownCallback event', event);
