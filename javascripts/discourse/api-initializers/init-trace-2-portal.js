@@ -147,7 +147,7 @@ export default apiInitializer("1.6", (api) => {
                 /* Add a callback for onKeyDown in search menu */
                 api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
                     console.log('onKeyDownCallback event', event);
-                    console.log('term: ', searchMenu.term);
+                    console.log('searchMenu: ', searchMenu);
                     if (event.key === "Enter") {
                         const traceTerm = document.getElementById("search-term").value;
                         if(debugSearchTracer){
