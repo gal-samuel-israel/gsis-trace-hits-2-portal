@@ -140,7 +140,7 @@ export default apiInitializer("1.6", (api) => {
 
                   api.addSearchResultsCallback((results) => {
                       if(debug){
-                        console.log('searchResults: ', results);
+                        //console.log('searchResults: ', results);
                         console.log('results.grouped_search_result.term:', results.grouped_search_result.term);
                       }
                       return results;
@@ -153,10 +153,10 @@ export default apiInitializer("1.6", (api) => {
                       //console.log('onKeyDownCallback event', event);
                       //console.log('searchMenu', searchMenu);
                       //console.log('searchMenu.search', searchMenu.search);
-                      console.log('searchMenu.search.activeGlobalSearchTerm: ', searchMenu.search.activeGlobalSearchTerm);
+                      //console.log('searchMenu.search.activeGlobalSearchTerm: ', searchMenu.search.activeGlobalSearchTerm);
                     }
                     if (event.key === "Enter") {
-                        const traceTerm = document.getElementById("search-term").value;
+                        const traceTerm = searchMenu.search.activeGlobalSearchTerm; //document.getElementById("search-term").value;
                         if(debugSearchTracer){
                           console.log('event.key', event.key);
                           console.log('clicked Enter lets trace:', traceTerm);
