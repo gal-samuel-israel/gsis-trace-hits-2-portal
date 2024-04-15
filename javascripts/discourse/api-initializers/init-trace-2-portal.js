@@ -38,6 +38,8 @@ export default apiInitializer("1.6", (api) => {
       const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
       var postTo = postToHost +'/user/community/comtr-action.php';
       var widget = postToHost +'/user/community/widget.js';
+
+      var lastTrace = null;
       
       /* START TRIAL */
       /*
@@ -139,10 +141,31 @@ export default apiInitializer("1.6", (api) => {
                   */
 
                   api.addSearchResultsCallback((results) => {
+                      const traceTerm = results.grouped_search_result.term;
                       if(debug){
                         //console.log('searchResults: ', results);
-                        console.log('results.grouped_search_result.term:', results.grouped_search_result.term);
+                        console.log('traceTerm:', traceTerm);
                       }
+                      if (lastTrace !== null || lastTrace === traceTerm){
+                        if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
+                        return results;
+                      }
+                      if(!window.algoTrace){return results;} 
+
+                      //trace to portal
+                      var the_action = 'community_search';
+                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                      if( secode !== window.algoSecVar_1){ return false; }
+
+                      var encodedTerm = encodeURIComponent(traceTerm);
+                      
+                      traceThis(postTo, secode, window.algoSecVar_2, {
+                        action: the_action,
+                        q: encodedTerm,
+                        xid: currentUser.external_id,                    
+                      });
+                      lastTrace = traceTerm;
+
                       return results;
                   });
                 } // end if(debug)
@@ -161,18 +184,27 @@ export default apiInitializer("1.6", (api) => {
                           console.log('event.key', event.key);
                           console.log('clicked Enter lets trace:', traceTerm);
                         }
-                        if(!window.algoTrace){return false;}  
+                        if (lastTrace !== null || lastTrace === traceTerm){
+                          if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
+                          return false;
+                        }
+
+                        if(!window.algoTrace){return false;}
+
+                        //trace to portal
                         var the_action = 'community_search';
                         var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
                         if( secode !== window.algoSecVar_1){ return false; }
 
                         var encodedTerm = encodeURIComponent(traceTerm);
-
+                        
                         traceThis(postTo, secode, window.algoSecVar_2, {
                           action: the_action,
                           q: encodedTerm,
                           xid: currentUser.external_id,                    
                         });
+                        lastTrace = traceTerm;
+                       
                     }                                      
                 });                  
 
