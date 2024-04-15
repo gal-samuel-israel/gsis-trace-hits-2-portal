@@ -139,7 +139,10 @@ export default apiInitializer("1.6", (api) => {
                   */
 
                   api.addSearchResultsCallback((results) => {
-                      console.log('searchResults: ', results);
+                      if(debug){
+                        console.log('searchResults: ', results);
+                        console.log('results.grouped_search_result.term:', results.grouped_search_result.term);
+                      }
                       return results;
                   });
                 } // end if(debug)
@@ -147,9 +150,9 @@ export default apiInitializer("1.6", (api) => {
                 /* Add a callback for onKeyDown in search menu */
                 api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
                     if(debug){
-                      console.log('onKeyDownCallback event', event);
-                      console.log('searchMenu', searchMenu);
-                      console.log('searchMenu.search', searchMenu.search);
+                      //console.log('onKeyDownCallback event', event);
+                      //console.log('searchMenu', searchMenu);
+                      //console.log('searchMenu.search', searchMenu.search);
                       console.log('searchMenu.search.activeGlobalSearchTerm: ', searchMenu.search.activeGlobalSearchTerm);
                     }
                     if (event.key === "Enter") {
