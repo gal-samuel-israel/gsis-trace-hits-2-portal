@@ -46,7 +46,7 @@ export default apiInitializer("1.6", (api) => {
           loadScript(widgetScriptUrl)
             .then(() => {
               // Widget script loaded successfully
-              console.log('triel success widget.js: loaded');
+              console.log('trial success widget.js: loaded');
               resolve();
             })
             .catch((error) => {
@@ -60,16 +60,7 @@ export default apiInitializer("1.6", (api) => {
         loadWidgetScript()
         .then(() => {
           // Widget script loaded successfully
-          // Now you can safely use the search-menu widget
-          console.log('trial of reopen');
-          api.reopenWidget("search-menu", {
-            // Your customization options for the search-menu widget
-            keyDown(e) {
-              console.log('overriding keyDown:' + e.key);
-              return this._super(e);
-            }
-
-          });
+          
         })
         .catch((error) => {
           // Error loading widget script
@@ -145,16 +136,32 @@ export default apiInitializer("1.6", (api) => {
 
                   });
                   */
-                  console.log('adding searchMenuOnKeyDownCallback'); 
+                  /* Add a callback for onKeyDown in search menu */
                   api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
-                    console.log('onKeyDownCallback', event);
-                    if (searchMenu.term === "stop") {
-                      return false;
-                    }
-                  });
-                    
+                      console.log('onKeyDownCallback event', event);
+                      console.log('term: ', searchMenu.term);
+                      if (event.key === "Enter") {
+                          const traceTerm = document.getElementById("search-term").value;
+                          if(debugSearchTracer){
+                            console.log('event.key', event.key);
+                            console.log('clicked Enter lets trace:', traceTerm);
+                          }
+                          if(!window.algoTrace){return false;}  
+                          var the_action = 'community_search';
+                          var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                          if( secode !== window.algoSecVar_1){ return false; }
 
-                }
+                          var encodedTerm = encodeURIComponent(traceTerm);
+
+                          traceThis(postTo, secode, window.algoSecVar_2, {
+                            action: the_action,
+                            q: encodedTerm,
+                            xid: currentUser.external_id,                    
+                          });
+                      }                                      
+                  });                  
+
+                } // end if(debug)
                 /*
                   console.log('trying reopenWidget search-menu');
                   api.reopenWidget("search-menu", {
