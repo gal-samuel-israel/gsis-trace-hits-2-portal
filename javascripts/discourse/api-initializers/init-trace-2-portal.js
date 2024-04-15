@@ -128,46 +128,60 @@ export default apiInitializer("1.6", (api) => {
                     var algoSecVar_2 = 'string'; //session ID
                 */
                 if(debug){ 
-                  console.log('widget.js: loaded');
-                  console.log('algoTrace:', algoTrace); 
-                  console.log('algoSecVar_1:', algoSecVar_1); 
-                  console.log('algoSecVar_2:', algoSecVar_2);                 
-                  
-                  /* NOT WORKING with error: 
-                  console.log('trying reopenWidget search-term');
-                  api.reopenWidget("search-term", {
+                    console.log('widget.js: loaded');
+                    console.log('algoTrace:', algoTrace); 
+                    console.log('algoSecVar_1:', algoSecVar_1); 
+                    console.log('algoSecVar_2:', algoSecVar_2);                 
+                    
+                    /* NOT WORKING with error: 
+                    console.log('trying reopenWidget search-term');
+                    api.reopenWidget("search-term", {
 
-                  });
-                  */
+                    });
+                    */
 
-                  api.addSearchResultsCallback((results) => {
-                      const traceTerm = results.grouped_search_result.term;
-                      if(debug){
-                        //console.log('searchResults: ', results);
-                        console.log('traceTerm:', traceTerm);
-                      }
-                      if (lastTrace === traceTerm){
-                        if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
-                        return results;
-                      }
-                      if(!window.algoTrace){return results;} 
+                    // debounce to capture full sentences in the search
+                    const debounce = (func, delay)=> {
+                      let timeoutId;                      
+                      return function(...args) {
+                          clearTimeout(timeoutId);
+                          timeoutId = setTimeout(() => {
+                              func.apply(this, args);
+                          }, delay);
+                      };
+                    }
 
-                      //trace to portal
-                      var the_action = 'community_search';
-                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                      if( secode !== window.algoSecVar_1){ return false; }
+                    // Wrap your API callback in a debounced function
+                    const debouncedSearchResultsCallback = debounce((results) => {
+                          const traceTerm = results.grouped_search_result.term;
+                          if(debug){
+                            //console.log('searchResults: ', results);
+                            console.log('traceTerm:', traceTerm);
+                          }
+                          if (lastTrace === traceTerm){
+                            if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
+                            return results;
+                          }
+                          if(!window.algoTrace){return results;} 
 
-                      var encodedTerm = encodeURIComponent(traceTerm);
-                      
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                        action: the_action,
-                        q: encodedTerm,
-                        xid: currentUser.external_id,                    
-                      });
-                      lastTrace = traceTerm;
+                          //trace to portal
+                          var the_action = 'community_search';
+                          var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                          if( secode !== window.algoSecVar_1){ return false; }
 
-                      return results;
-                  });
+                          var encodedTerm = encodeURIComponent(traceTerm);
+                          
+                          traceThis(postTo, secode, window.algoSecVar_2, {
+                            action: the_action,
+                            q: encodedTerm,
+                            xid: currentUser.external_id,                    
+                          });
+                          lastTrace = traceTerm;
+
+                          return results;
+                    }, 1500); // Adjust the delay time (in milliseconds) as needed
+
+                    api.addSearchResultsCallback(debouncedSearchResultsCallback);
                 } // end if(debug)
 
                 /* Add a callback for onKeyDown in search menu */
