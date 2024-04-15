@@ -40,6 +40,7 @@ export default apiInitializer("1.6", (api) => {
       var widget = postToHost +'/user/community/widget.js';
       
       /* START TRIAL */
+      /*
       function loadWidgetScript() {
         return new Promise((resolve, reject) => {
           const widgetScriptUrl = widget; // Replace with the actual URL
@@ -67,7 +68,7 @@ export default apiInitializer("1.6", (api) => {
           console.error("Error loading widget script:", error);
         });
       }
-
+      */
       /* END TRIAL */
           
           
@@ -99,22 +100,22 @@ export default apiInitializer("1.6", (api) => {
           };
 
           const traceThis = function(postToURL, secode, algoSecVar_2, dataObj){
-            ajax(postToURL, {
-              type: "POST",
-              headers: {
-                'X-Origin': 'community.algosec.com',
-                'Authorization': 'Bearer ' + secode,
-                'Promote': 'Bearer ' + algoSecVar_2,
-              },
-              data: dataObj,
-              redirect: 'follow',
-            })
-              .catch((data)=>{
-                  if(debug){ console.log('trace exception', data);}
+              ajax(postToURL, {
+                type: "POST",
+                headers: {
+                  'X-Origin': 'community.algosec.com',
+                  'Authorization': 'Bearer ' + secode,
+                  'Promote': 'Bearer ' + algoSecVar_2,
+                },
+                data: dataObj,
+                redirect: 'follow',
               })
-              .finally(()=>{
-                  if(debug){ console.log('traced '+dataObj.action);}
-              });
+                .catch((data)=>{
+                    if(debug){ console.log('trace exception', data);}
+                })
+                .finally(()=>{
+                    if(debug){ console.log('traced '+dataObj.action);}
+                });
           };
 
           loadScript(widget).then((resp) => {
@@ -130,7 +131,7 @@ export default apiInitializer("1.6", (api) => {
                   console.log('algoSecVar_1:', algoSecVar_1); 
                   console.log('algoSecVar_2:', algoSecVar_2);                 
                   
-                  /* NOT WORKING with wrror: 
+                  /* NOT WORKING with error: 
                   console.log('trying reopenWidget search-term');
                   api.reopenWidget("search-term", {
 
@@ -141,33 +142,34 @@ export default apiInitializer("1.6", (api) => {
                       console.log(results);
                       return results;
                   });
-                  
-                  /* Add a callback for onKeyDown in search menu */
-                  api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
-                      console.log('onKeyDownCallback event', event);
-                      console.log('term: ', searchMenu.term);
-                      if (event.key === "Enter") {
-                          const traceTerm = document.getElementById("search-term").value;
-                          if(debugSearchTracer){
-                            console.log('event.key', event.key);
-                            console.log('clicked Enter lets trace:', traceTerm);
-                          }
-                          if(!window.algoTrace){return false;}  
-                          var the_action = 'community_search';
-                          var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                          if( secode !== window.algoSecVar_1){ return false; }
-
-                          var encodedTerm = encodeURIComponent(traceTerm);
-
-                          traceThis(postTo, secode, window.algoSecVar_2, {
-                            action: the_action,
-                            q: encodedTerm,
-                            xid: currentUser.external_id,                    
-                          });
-                      }                                      
-                  });                  
-
                 } // end if(debug)
+
+                /* Add a callback for onKeyDown in search menu */
+                api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
+                    console.log('onKeyDownCallback event', event);
+                    console.log('term: ', searchMenu.term);
+                    if (event.key === "Enter") {
+                        const traceTerm = document.getElementById("search-term").value;
+                        if(debugSearchTracer){
+                          console.log('event.key', event.key);
+                          console.log('clicked Enter lets trace:', traceTerm);
+                        }
+                        if(!window.algoTrace){return false;}  
+                        var the_action = 'community_search';
+                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                        if( secode !== window.algoSecVar_1){ return false; }
+
+                        var encodedTerm = encodeURIComponent(traceTerm);
+
+                        traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: the_action,
+                          q: encodedTerm,
+                          xid: currentUser.external_id,                    
+                        });
+                    }                                      
+                });                  
+
+                
                 /*
                   console.log('trying reopenWidget search-menu');
                   api.reopenWidget("search-menu", {
@@ -231,6 +233,14 @@ export default apiInitializer("1.6", (api) => {
                 let appEvents = api.container.lookup('service:app-events');
                 startPageTracking(router, appEvents);
 
+                if(debug){
+                  // Add an event listener for all events emitted by appEvents
+                  appEvents.on('event', eventName => {
+                    // Handle the event here
+                    console.log('Event captured:', eventName);
+                  });
+                }
+                
                 appEvents.on('page:changed', data => {                
                     var traceCheck = isUrlForTracing(data.url);
                     if(traceCheck.shouldTrace) {                                                                                 
@@ -269,14 +279,6 @@ export default apiInitializer("1.6", (api) => {
                 }
 
           }); 
-
-          /*
-          api.registerConnectorClass("above-site-header", "home-modal", {
-            shouldRender() {
-              return true;
-            },
-          });
-          */
    
     }
 
