@@ -139,7 +139,7 @@ export default apiInitializer("1.6", (api) => {
                   */
 
                   api.addSearchResultsCallback((results) => {
-                      console.log(results);
+                      console.log('searchResults: ', results);
                       return results;
                   });
                 } // end if(debug)
