@@ -327,9 +327,11 @@ export default apiInitializer("1.6", (api) => {
     
       // Use window.onload event to wait for the entire page to load
       if (document.readyState === "complete") {
-        onPageLoad();
+        setTimeout(onPageLoad, 500);
       } else {
-        window.onload = onPageLoad;
+        window.onload = function() {
+            setTimeout(onPageLoad, 500);
+        };
       }
 
     }
