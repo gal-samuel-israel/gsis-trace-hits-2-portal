@@ -132,8 +132,9 @@ export default apiInitializer("1.6", (api) => {
                     console.log('algoTrace:', algoTrace); 
                     console.log('algoSecVar_1:', algoSecVar_1); 
                     console.log('algoSecVar_2:', algoSecVar_2);                                    
-
+                  } // end if(debug)
                     /* this call back is not addequate for tracing as it catches all words one by one */
+                    /*
                     api.addSearchResultsCallback((results) => {
                         const traceTerm = results.grouped_search_result.term;
                         if(debug){
@@ -162,9 +163,9 @@ export default apiInitializer("1.6", (api) => {
 
                         return results;
                     });
-                } // end if(debug)
+                */
 
-                /* Add a callback for onKeyDown in search menu */
+                /* Add a callback for onKeyDown in search menu + when enter clicked: trace the term */
                 api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
                     if(debug){
                       //console.log('onKeyDownCallback event', event);
@@ -203,7 +204,7 @@ export default apiInitializer("1.6", (api) => {
                 });                  
 
                 
-                /*
+                /* //This code can't be used to to version changes in discord. api.reopenWidget("search-menu", callback) is not working since 2024-04
                   console.log('trying reopenWidget search-menu');
                   api.reopenWidget("search-menu", {
                     //override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js
@@ -310,11 +311,9 @@ export default apiInitializer("1.6", (api) => {
 
 
     if(debug){
-
-      function onPageLoad() {
-        // Your API requests or any other logic can go here
-        console.log("Page components have finished loading.");
-        
+      /* try to trace with adding events to DOM elements dynamically (not the discourse way, but ... seems like we need to) */
+      function onPageLoad() {       
+        console.log("Page components have finished loading.");        
         //capture change on input#search-term        
         var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
         searchInputs.forEach(function(input) {
@@ -323,15 +322,37 @@ export default apiInitializer("1.6", (api) => {
             });
         });
         
+        //handle DOM mutations        
+        function handleDomChange(mutationsList, observer) {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    // Check if the mutation added a new input element
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === Node.ELEMENT_NODE && node.matches('.search-menu-container input#search-term')) {
+                            // Attach event listener to the newly added input
+                            node.addEventListener('change', function(event) {
+                                console.log('term change:', event.target.value);
+                            });
+                        }
+                    });
+                }
+            }
+        }
+
+        // Create a MutationObserver instance
+        const observer = new MutationObserver(handleDomChange);
+        // Start observing changes in the body element (or any other ancestor)
+        observer.observe(document.body, { childList: true, subtree: true });
+
       }
     
       // Use window.onload event to wait for the entire page to load
       if (document.readyState === "complete") {
-        setTimeout(onPageLoad, 500);
+          setTimeout(onPageLoad, 500);
       } else {
-        window.onload = function() {
-            setTimeout(onPageLoad, 500);
-        };
+          window.onload = function() {
+              setTimeout(onPageLoad, 500);
+          };
       }
 
     }
