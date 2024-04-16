@@ -40,85 +40,51 @@ export default apiInitializer("1.6", (api) => {
       var widget = postToHost +'/user/community/widget.js';
 
       window.lastTrace = null;
-      
-      /* START TRIAL */
-      /*
-      function loadWidgetScript() {
-        return new Promise((resolve, reject) => {
-          const widgetScriptUrl = widget; // Replace with the actual URL
-          loadScript(widgetScriptUrl)
-            .then(() => {
-              // Widget script loaded successfully
-              console.log('trial success widget.js: loaded');
-              resolve();
+           
+      const router = api.container.lookup('router:main');          
+
+      const isUrlForTracing = function(url){
+            var urlPrefix = "(/t/)"; // |/c/|/tag/ 
+            var searchPrefix = "(/search)";
+            var pattern = new RegExp('^' + urlPrefix);
+            var s_pattern = new RegExp('^' + searchPrefix);
+            var hasPrefix = pattern.test(url);
+            var hasSearchPrefix = s_pattern.test(url);
+
+            if(debugHitsTracer){ 
+              console.log('url:', url); 
+              console.log('hasSearchPrefix:', hasSearchPrefix); 
+              console.log('hasPrefix:', hasPrefix);
+              console.log('algoTrace:', window.algoTrace); 
+              console.log('algoSecVar_1:', window.algoSecVar_1); 
+              console.log('algoSecVar_2:', window.algoSecVar_2); 
+            } 
+
+            return {
+              'shouldTrace':(hasPrefix || hasSearchPrefix),
+              'hasPrefix': hasPrefix,
+              'hasSearchPrefix': hasSearchPrefix,
+            };
+      };
+
+      const traceThis = function(postToURL, secode, algoSecVar_2, dataObj){
+          ajax(postToURL, {
+            type: "POST",
+            headers: {
+              'X-Origin': 'community.algosec.com',
+              'Authorization': 'Bearer ' + secode,
+              'Promote': 'Bearer ' + algoSecVar_2,
+            },
+            data: dataObj,
+            redirect: 'follow',
+          })
+            .catch((data)=>{
+                if(debug){ console.log('trace exception', data);}
             })
-            .catch((error) => {
-              // Error loading widget script
-              reject(error);
+            .finally(()=>{
+                if(debug){ console.log('traced '+dataObj.action);}
             });
-        });
-      }
-
-      if(debug){ 
-        loadWidgetScript()
-        .then(() => {
-          // Widget script loaded successfully
-          
-        })
-        .catch((error) => {
-          // Error loading widget script
-          console.error("Error loading widget script:", error);
-        });
-      }
-      */
-      /* END TRIAL */
-          
-          
-          
-          const router = api.container.lookup('router:main');          
-
-          const isUrlForTracing = function(url){
-                var urlPrefix = "(/t/)"; // |/c/|/tag/ 
-                var searchPrefix = "(/search)";
-                var pattern = new RegExp('^' + urlPrefix);
-                var s_pattern = new RegExp('^' + searchPrefix);
-                var hasPrefix = pattern.test(url);
-                var hasSearchPrefix = s_pattern.test(url);
-
-                if(debugHitsTracer){ 
-                  console.log('url:', url); 
-                  console.log('hasSearchPrefix:', hasSearchPrefix); 
-                  console.log('hasPrefix:', hasPrefix);
-                  console.log('algoTrace:', window.algoTrace); 
-                  console.log('algoSecVar_1:', window.algoSecVar_1); 
-                  console.log('algoSecVar_2:', window.algoSecVar_2); 
-                } 
-
-                return {
-                  'shouldTrace':(hasPrefix || hasSearchPrefix),
-                  'hasPrefix': hasPrefix,
-                  'hasSearchPrefix': hasSearchPrefix,
-                };
-          };
-
-          const traceThis = function(postToURL, secode, algoSecVar_2, dataObj){
-              ajax(postToURL, {
-                type: "POST",
-                headers: {
-                  'X-Origin': 'community.algosec.com',
-                  'Authorization': 'Bearer ' + secode,
-                  'Promote': 'Bearer ' + algoSecVar_2,
-                },
-                data: dataObj,
-                redirect: 'follow',
-              })
-                .catch((data)=>{
-                    if(debug){ console.log('trace exception', data);}
-                })
-                .finally(()=>{
-                    if(debug){ console.log('traced '+dataObj.action);}
-                });
-          };
+      };
 
           const handleTrace = function(theAction, traceTerm){
               if(debugSearchTracer){ console.log('handleTrace term:', traceTerm);}
@@ -127,7 +93,6 @@ export default apiInitializer("1.6", (api) => {
                 return false;
               }
               if(!window.algoTrace){return false;}
-              //trace to portal              
               var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
               if( secode !== window.algoSecVar_1){ return false; }
               var encodedTerm = encodeURIComponent(traceTerm);              
@@ -140,49 +105,8 @@ export default apiInitializer("1.6", (api) => {
           };
 
           loadScript(widget).then((resp) => {
-                /*
-                    if loadScript is successful it sets:
-                    var algoTrace = true;
-                    var algoSecVar_1 = 'string'; 
-                    var algoSecVar_2 = 'string'; //session ID
-                */
-                if(debug){ 
-                    console.log('widget.js: loaded');
-                    console.log('algoTrace:', algoTrace); 
-                    console.log('algoSecVar_1:', algoSecVar_1); 
-                    console.log('algoSecVar_2:', algoSecVar_2);                                    
-                  } // end if(debug)
-                    /* this call back is not addequate for tracing as it catches all words one by one */
-                    /*
-                    api.addSearchResultsCallback((results) => {
-                        const traceTerm = results.grouped_search_result.term;
-                        if(debug){
-                          console.log('searchResults: ', results);
-                          console.log('traceTerm:', traceTerm);
-                        }
-                        if (lastTrace === traceTerm){
-                          if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
-                          return results;
-                        }
-                        if(!window.algoTrace){return results;} 
-
-                        //trace to portal
-                        var the_action = 'community_search';
-                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                        if( secode !== window.algoSecVar_1){ return false; }
-
-                        var encodedTerm = encodeURIComponent(traceTerm);
-                        
-                        traceThis(postTo, secode, window.algoSecVar_2, {
-                          action: the_action,
-                          q: encodedTerm,
-                          xid: currentUser.external_id,                    
-                        });
-                        lastTrace = traceTerm;
-
-                        return results;
-                    });
-                */
+                /* if loadScript is successful it sets: var algoTrace = true; var algoSecVar_1 = 'string'; var algoSecVar_2 = 'string'; //session ID */
+                if(debug){ console.log('widget.js: loaded'); console.log('algoTrace:', algoTrace); console.log('algoSecVar_1:', algoSecVar_1); console.log('algoSecVar_2:', algoSecVar_2); } 
 
                 /* Add a callback for onKeyDown in search menu + when enter clicked: trace the term */
                 api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
@@ -200,70 +124,9 @@ export default apiInitializer("1.6", (api) => {
                         }
                         handleTrace('community_search', traceTerm);
                     }                                      
-                });                  
-
-                
-                /* //This code can't be used to to version changes in discord. api.reopenWidget("search-menu", callback) is not working since 2024-04
-                  console.log('trying reopenWidget search-menu');
-                  api.reopenWidget("search-menu", {
-                    //override any function in : \discourse-main\app\assets\javascripts\discourse\app\widgets\search-menu.js
-                    traceTerm: null,                  
-
-                    searchTermChanged(term, opts = {}) {  
-                      if(!window.algoTrace){return false;}              
-                      if(debugSearchTracer){console.log('searchTermChanged', term, opts);}
-                      this.traceTerm = term;
-                      if(opts?.searchTopics ){
-                        if(debugSearchTracer){console.log('clicked searchTopic lets trace:', this.traceTerm);}
-
-                        var the_action = 'community_search';
-                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                        if( secode !== window.algoSecVar_1){ return false; }
-
-                        var encodedTerm = encodeURIComponent(term);
-
-                        traceThis(postTo, secode, window.algoSecVar_2, {
-                          action: the_action,
-                          q: encodedTerm,
-                          xid: currentUser.external_id,                    
-                        });
-
-                      }                                        
-
-                      return this._super(term, opts);
-                    },
-
-                    keyDown(e) {                                
-                      if (e.key === "Enter") {
-                        this.traceTerm = document.getElementById("search-term").value;
-                        if(debugSearchTracer){
-                          console.log('e.key', e.key);
-                          console.log('clicked Enter lets trace:', this.traceTerm);
-                        }
-                        if(!window.algoTrace){return false;}  
-                        var the_action = 'community_search';
-                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                        if( secode !== window.algoSecVar_1){ return false; }
-
-                        var encodedTerm = encodeURIComponent(this.traceTerm);
-
-                        traceThis(postTo, secode, window.algoSecVar_2, {
-                          action: the_action,
-                          q: encodedTerm,
-                          xid: currentUser.external_id,                    
-                        });
-                      }
-                      return this._super(e);
-                    },
-
-                  });
-                  */
-                
-                //DEPRECATED//router.on('willTransition', viewTrackingRequired);
-                //replaced by routeWillChange:
-                router.on('routeWillChange', viewTrackingRequired);
-                //if(debug){ console.log('router:', router); }              
-
+                });
+                                
+                router.on('routeWillChange', viewTrackingRequired);                          
                 let appEvents = api.container.lookup('service:app-events');
                 startPageTracking(router, appEvents);                
 
@@ -281,6 +144,11 @@ export default apiInitializer("1.6", (api) => {
                           xid: currentUser.external_id,                    
                         });
                     }
+                });
+
+                appEvents.on('post-stream:refresh', data => { 
+                    console.log('event post-stream:refresh');
+                    console.log('data:', data);
                 });
 
                 //will run once (or first page loaf or a page refresh)
