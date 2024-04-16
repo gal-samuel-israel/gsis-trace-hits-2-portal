@@ -260,19 +260,12 @@ export default apiInitializer("1.6", (api) => {
                   */
                 
                 //DEPRECATED//router.on('willTransition', viewTrackingRequired);
+                //replaced by routeWillChange:
                 router.on('routeWillChange', viewTrackingRequired);
                 //if(debug){ console.log('router:', router); }              
 
                 let appEvents = api.container.lookup('service:app-events');
-                startPageTracking(router, appEvents);
-
-                if(debug){
-                  // Add an event listener for all events emitted by appEvents
-                  appEvents.on('all', (eventName, ...eventData) => {
-                    // Handle the event name and event data here
-                    console.log('Event captured:', eventName, eventData);
-                  });
-                }
+                startPageTracking(router, appEvents);                
 
                 appEvents.on('page:changed', data => {                
                     var traceCheck = isUrlForTracing(data.url);
@@ -321,8 +314,16 @@ export default apiInitializer("1.6", (api) => {
       function onPageLoad() {
         // Your API requests or any other logic can go here
         console.log("Page components have finished loading.");
-        // Example API request:
-        // api.ajax({ ... });
+        
+        //capture change on input#search-term
+        document.addEventListener('DOMContentLoaded', function() {
+            var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
+            searchInputs.forEach(function(input) {
+                input.addEventListener('change', function(event) {                    
+                    console.log('term change:', event.target.value);
+                });
+            });
+        });
       }
     
       // Use window.onload event to wait for the entire page to load
