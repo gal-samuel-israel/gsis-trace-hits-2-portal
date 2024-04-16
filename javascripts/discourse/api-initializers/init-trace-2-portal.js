@@ -146,12 +146,7 @@ export default apiInitializer("1.6", (api) => {
                     }
                 });
 
-                appEvents.on('post-stream:refresh', data => { 
-                    console.log('event post-stream:refresh');
-                    console.log('data:', data);
-                });
-
-                //will run once (or first page loaf or a page refresh)
+                //will run once (or first page load or a page refresh)
                 if(window.algoTrace){
                     var onloadTrace = isUrlForTracing(window.location.pathname);
                     if(onloadTrace.shouldTrace) {
@@ -168,59 +163,61 @@ export default apiInitializer("1.6", (api) => {
                     }
                 }
 
+                if(debug){
+                  /* try to trace with adding events to DOM elements dynamically (not the discourse way, but ... seems like we need to) */
+                  function onPageLoad() {       
+                    console.log("Page components have finished loading.");        
+                    //capture change on input#search-term        
+                    var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
+                    searchInputs.forEach(function(input) {
+                        input.addEventListener('change', function(event) {                    
+                            console.log('term change:', event.target.value);
+                            handleTrace('community_search', event.target.value);
+                        });
+                    });
+                    
+                    //handle DOM mutations        
+                    function handleDomChange(mutationsList, observer) {
+                        for (let mutation of mutationsList) {
+                            if (mutation.type === 'childList') {
+                                // Check if the mutation added a new input element
+                                mutation.addedNodes.forEach(node => {
+                                    if (node.nodeType === Node.ELEMENT_NODE && node.matches('.search-menu-container input#search-term')) {
+                                        // Attach event listener to the newly added input
+                                        node.addEventListener('change', function(event) {
+                                            console.log('term change:', event.target.value);
+                                            handleTrace('community_search', event.target.value);
+                                        });
+                                    }
+                                });
+                            }
+                        }
+                    }
+            
+                    // Create a MutationObserver instance
+                    const observer = new MutationObserver(handleDomChange);
+                    // Start observing changes in the body element (or any other ancestor)
+                    observer.observe(document.body, { childList: true, subtree: true });
+            
+                  }
+                
+                  // Use window.onload event to wait for the entire page to load
+                  if (document.readyState === "complete") {
+                      setTimeout(onPageLoad, 500);
+                  } else {
+                      window.onload = function() {
+                          setTimeout(onPageLoad, 500);
+                      };
+                  }
+            
+                }
+
           }); 
    
     }
 
 
-    if(debug){
-      /* try to trace with adding events to DOM elements dynamically (not the discourse way, but ... seems like we need to) */
-      function onPageLoad() {       
-        console.log("Page components have finished loading.");        
-        //capture change on input#search-term        
-        var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
-        searchInputs.forEach(function(input) {
-            input.addEventListener('change', function(event) {                    
-                console.log('term change:', event.target.value);
-                handleTrace('community_search', event.target.value);
-            });
-        });
-        
-        //handle DOM mutations        
-        function handleDomChange(mutationsList, observer) {
-            for (let mutation of mutationsList) {
-                if (mutation.type === 'childList') {
-                    // Check if the mutation added a new input element
-                    mutation.addedNodes.forEach(node => {
-                        if (node.nodeType === Node.ELEMENT_NODE && node.matches('.search-menu-container input#search-term')) {
-                            // Attach event listener to the newly added input
-                            node.addEventListener('change', function(event) {
-                                console.log('term change:', event.target.value);
-                                handleTrace('community_search', event.target.value);
-                            });
-                        }
-                    });
-                }
-            }
-        }
-
-        // Create a MutationObserver instance
-        const observer = new MutationObserver(handleDomChange);
-        // Start observing changes in the body element (or any other ancestor)
-        observer.observe(document.body, { childList: true, subtree: true });
-
-      }
     
-      // Use window.onload event to wait for the entire page to load
-      if (document.readyState === "complete") {
-          setTimeout(onPageLoad, 500);
-      } else {
-          window.onload = function() {
-              setTimeout(onPageLoad, 500);
-          };
-      }
-
-    }
 
 
   }  
