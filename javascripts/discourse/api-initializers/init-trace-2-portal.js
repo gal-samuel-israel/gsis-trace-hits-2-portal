@@ -315,15 +315,14 @@ export default apiInitializer("1.6", (api) => {
         // Your API requests or any other logic can go here
         console.log("Page components have finished loading.");
         
-        //capture change on input#search-term
-        document.addEventListener('DOMContentLoaded', function() {
-            var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
-            searchInputs.forEach(function(input) {
-                input.addEventListener('change', function(event) {                    
-                    console.log('term change:', event.target.value);
-                });
+        //capture change on input#search-term        
+        var searchInputs = document.querySelectorAll('.search-menu-container input#search-term');
+        searchInputs.forEach(function(input) {
+            input.addEventListener('change', function(event) {                    
+                console.log('term change:', event.target.value);
             });
         });
+        
       }
     
       // Use window.onload event to wait for the entire page to load
@@ -339,4 +338,3 @@ export default apiInitializer("1.6", (api) => {
   }  
 
 });
-
