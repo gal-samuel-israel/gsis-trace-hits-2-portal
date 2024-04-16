@@ -39,7 +39,7 @@ export default apiInitializer("1.6", (api) => {
       var postTo = postToHost +'/user/community/comtr-action.php';
       var widget = postToHost +'/user/community/widget.js';
 
-      var lastTrace = null;
+      window.lastTrace = null;
       
       /* START TRIAL */
       /*
@@ -120,6 +120,25 @@ export default apiInitializer("1.6", (api) => {
                 });
           };
 
+          const handleTrace = function(theAction, traceTerm){
+              if(debugSearchTracer){ console.log('handleTrace term:', traceTerm);}
+              if(window.lastTrace === traceTerm){
+                if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
+                return false;
+              }
+              if(!window.algoTrace){return false;}
+              //trace to portal              
+              var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+              if( secode !== window.algoSecVar_1){ return false; }
+              var encodedTerm = encodeURIComponent(traceTerm);              
+              traceThis(postTo, secode, window.algoSecVar_2, {
+                action: theAction,
+                q: encodedTerm,
+                xid: currentUser.external_id,                    
+              });
+              window.lastTrace = traceTerm;
+          };
+
           loadScript(widget).then((resp) => {
                 /*
                     if loadScript is successful it sets:
@@ -167,39 +186,19 @@ export default apiInitializer("1.6", (api) => {
 
                 /* Add a callback for onKeyDown in search menu + when enter clicked: trace the term */
                 api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {
-                    if(debug){
+                    /* if(debug){
                       //console.log('onKeyDownCallback event', event);
                       //console.log('searchMenu', searchMenu);
                       //console.log('searchMenu.search', searchMenu.search);
                       //console.log('searchMenu.search.activeGlobalSearchTerm: ', searchMenu.search.activeGlobalSearchTerm);
-                    }
+                    } */
                     if (event.key === "Enter") {
                         const traceTerm = searchMenu.search.activeGlobalSearchTerm; //document.getElementById("search-term").value;
                         if(debugSearchTracer){
                           console.log('event.key', event.key);
                           console.log('clicked Enter lets trace:', traceTerm);
                         }
-                        if (lastTrace === traceTerm){
-                          if(debugSearchTracer){ console.log('lastTrace already traced:', lastTrace); }
-                          return false;
-                        }
-
-                        if(!window.algoTrace){return false;}
-
-                        //trace to portal
-                        var the_action = 'community_search';
-                        var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                        if( secode !== window.algoSecVar_1){ return false; }
-
-                        var encodedTerm = encodeURIComponent(traceTerm);
-                        
-                        traceThis(postTo, secode, window.algoSecVar_2, {
-                          action: the_action,
-                          q: encodedTerm,
-                          xid: currentUser.external_id,                    
-                        });
-                        lastTrace = traceTerm;
-                       
+                        handleTrace('community_search', traceTerm);
                     }                                      
                 });                  
 
@@ -271,14 +270,11 @@ export default apiInitializer("1.6", (api) => {
                 appEvents.on('page:changed', data => {                
                     var traceCheck = isUrlForTracing(data.url);
                     if(traceCheck.shouldTrace) {                                                                                 
-                        var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                      
-
+                        var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                                              
                         if(!window.algoTrace){return false;}
                         var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
                         if( secode !== window.algoSecVar_1){ return false; }
-
                         var encodedURL = encodeURIComponent(data.url);
-
                         traceThis(postTo, secode, window.algoSecVar_2, {
                           action: the_action,
                           q: encodedURL,
@@ -295,7 +291,6 @@ export default apiInitializer("1.6", (api) => {
                         var onLoadSecode = xMD5(currentUser.external_id + window.algoSecVar_2);
                         if( onLoadSecode == window.algoSecVar_1){
                             var onLoadEncodedURL = encodeURIComponent(window.location.pathname);
-
                             traceThis(postTo, onLoadSecode, window.algoSecVar_2, {
                               action: onLoadAction,
                               q: onLoadEncodedURL,
@@ -319,6 +314,7 @@ export default apiInitializer("1.6", (api) => {
         searchInputs.forEach(function(input) {
             input.addEventListener('change', function(event) {                    
                 console.log('term change:', event.target.value);
+                handleTrace('community_search', event.target.value);
             });
         });
         
@@ -332,6 +328,7 @@ export default apiInitializer("1.6", (api) => {
                             // Attach event listener to the newly added input
                             node.addEventListener('change', function(event) {
                                 console.log('term change:', event.target.value);
+                                handleTrace('community_search', event.target.value);
                             });
                         }
                     });
