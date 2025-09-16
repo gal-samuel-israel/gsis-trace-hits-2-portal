@@ -164,7 +164,7 @@ export default apiInitializer("1.6", (api) => {
                       if (debug) { console.log("Reply created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
                           action: "community_reply",
-                          q: JSON.stringify({replay_length: encodeURIComponent(post.raw).length, topic_id: post.topic_id, post_id: post.id}),
+                          q: JSON.stringify({reply_length: encodeURIComponent(post.raw).length, topic_id: post.topic_id, post_id: post.id}),
                           xid: currentUser.external_id
                       });
                   }
