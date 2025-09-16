@@ -140,6 +140,35 @@ export default apiInitializer("1.6", (api) => {
                         xid: currentUser.external_id,                    
                       });
                   }
+
+                  if (traceCheck.hasPrefix) { // topic page
+                    // Extract topic ID from URL, e.g. /t/topic-title/123
+                    const match = data.url.match(/\/t\/[^\/]+\/(\d+)/);
+                    if (match) {
+                        const topicId = match[1];
+                        // Fetch topic data
+                        ajax(`/t/${topicId}.json`).then(topicData => {
+                            // Check if the first post belongs to the current user
+                            const firstPost = topicData.post_stream.posts[0];
+                            if (firstPost && firstPost.user_id === currentUser.id) {
+                              // Check if the topic was created within the last 30 seconds
+                              const createdAt = new Date(firstPost.created_at).getTime();
+                              const now = Date.now();
+                              if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds
+                                  traceThis(postTo, secode, window.algoSecVar_2, {
+                                      action: "community_new_topic",
+                                      q: JSON.stringify({
+                                          title: encodeURIComponent(topicData.title),
+                                          topic_id: topicData.id,
+                                          post_id: firstPost.id
+                                      }),
+                                      xid: currentUser.external_id
+                                  });
+                              }
+                            }
+                        });
+                    }
+                  }
               });
 
               // Listen for post:created
