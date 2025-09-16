@@ -142,7 +142,7 @@ export default apiInitializer("1.6", (api) => {
                   }
               });
 
-              // Listen for composer post success (new topic or reply)
+              // Listen for post:created
               appEvents.on("post:created", (post) => {
                   if(debug){ console.log('post:',post); }
                   if (!window.algoTrace) { return; }
@@ -168,6 +168,11 @@ export default apiInitializer("1.6", (api) => {
                           xid: currentUser.external_id
                       });
                   }
+              });
+              
+              // Listen for composer:post:success
+              api.onAppEvent("composer:post:success", (composerModel, post) => {
+                  if (debug) { console.log("composer:post:success:", post); }
               });
 
               //will run once (or first page load or a page refresh)
