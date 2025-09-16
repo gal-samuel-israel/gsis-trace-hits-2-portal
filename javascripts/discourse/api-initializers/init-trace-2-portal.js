@@ -35,7 +35,8 @@ export default apiInitializer("1.6", (api) => {
     if(!blockTrace){
 
         if(debug){ console.log('trace active'); }        
-        const postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
+        let postToHost = (settings.trace_to_live_portal) ? 'https://portal.algosec.com':'https://dev16-portal.algosec.com';
+        if (settings.trace_debug_4_admins && isAdmin) { postToHost = 'https://dev16-portal.algosec.com'; }
         var postTo = postToHost +'/user/community/comtr-action.php';
         var widget = postToHost +'/user/community/widget.js';
 
@@ -105,6 +106,34 @@ export default apiInitializer("1.6", (api) => {
         loadScript(widget).then((resp) => {
               /* if loadScript is successful it sets: var algoTrace = true; var algoSecVar_1 = 'string'; var algoSecVar_2 = 'string'; //session ID */
               if(debug){ console.log('widget.js: loaded'); console.log('algoTrace:', algoTrace); console.log('algoSecVar_1:', algoSecVar_1); console.log('algoSecVar_2:', algoSecVar_2); } 
+             
+              // Listen for composer post success (new topic or reply)
+              api.onAppEvent("composer:post:success", (composerModel, post) => {
+                  if (!window.algoTrace) { return; }
+                  if (!isAdmin) { return; } //only for admins
+                  if(debug){ console.log('composerModel:',composerModel); }
+
+                  var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                  if (secode !== window.algoSecVar_1) { return; }
+
+                  // New topic: post.post_number === 1
+                  if (post.post_number === 1) {
+                      if (debug) { console.log("New topic created:", post); }
+                      traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: "community_new_topic",
+                          q: {title: encodeURIComponent(post.title), topic_id: post.topic_id, post_id: post.id},
+                          xid: currentUser.external_id
+                      });
+                  } else if (post.post_number > 1) {
+                      // Reply to topic
+                      if (debug) { console.log("Reply created:", post); }
+                      traceThis(postTo, secode, window.algoSecVar_2, {
+                          action: "community_reply",
+                          q: {replay_length: encodeURIComponent(post.raw).length, topic_id: post.topic_id, post_id: post.id},
+                          xid: currentUser.external_id
+                      });
+                  }
+              });
 
               /* Add a callback for onKeyDown in search menu + when enter clicked: trace the term */
               api.addSearchMenuOnKeyDownCallback((searchMenu, event) => {

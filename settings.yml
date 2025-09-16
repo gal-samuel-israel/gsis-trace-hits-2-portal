@@ -28,3 +28,7 @@ trace_to_live_portal:
   type: bool
   default: false
   description: "check for live portal or un-check for DEV server"
+trace_debug_4_admins:
+  type: bool
+  default: false
+  description: "check for sending admin trace th DEV server"
