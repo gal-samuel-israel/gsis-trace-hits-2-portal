@@ -127,20 +127,8 @@ export default apiInitializer("1.6", (api) => {
               startPageTracking(router, appEvents);                
 
               appEvents.on('page:changed', data => {                
-                  var traceCheck = isUrlForTracing(data.url);
-                  if(traceCheck.shouldTrace) {                                                                                 
-                      var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                                              
-                      if(!window.algoTrace){return false;}
-                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
-                      if( secode !== window.algoSecVar_1){ return false; }
-                      var encodedURL = encodeURIComponent(data.url);
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                        action: the_action,
-                        q: encodedURL,
-                        xid: currentUser.external_id,                    
-                      });
-                  }
-
+                  var traceCheck = isUrlForTracing(data.url);                  
+                  let topicCreationTime = false;
                   if (traceCheck.hasPrefix) { // topic page
                     // Extract topic ID from URL, e.g. /t/topic-title/123
                     const match = data.url.match(/\/t\/[^\/]+\/(\d+)/);
@@ -155,6 +143,7 @@ export default apiInitializer("1.6", (api) => {
                               const createdAt = new Date(firstPost.created_at).getTime();
                               const now = Date.now();
                               if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds
+                                  topicCreationTime = true;
                                   traceThis(postTo, secode, window.algoSecVar_2, {
                                       action: "community_new_topic",
                                       q: JSON.stringify({
@@ -169,6 +158,20 @@ export default apiInitializer("1.6", (api) => {
                         });
                     }
                   }
+                  //track hit if not new topic
+                  if(traceCheck.shouldTrace && !topicCreationTime) {                                                                                 
+                      var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                                              
+                      if(!window.algoTrace){return false;}
+                      var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
+                      if( secode !== window.algoSecVar_1){ return false; }
+                      var encodedURL = encodeURIComponent(data.url);
+                      traceThis(postTo, secode, window.algoSecVar_2, {
+                        action: the_action,
+                        q: encodedURL,
+                        xid: currentUser.external_id,                    
+                      });
+                  }
+
               });
 
               // Listen for post:created
