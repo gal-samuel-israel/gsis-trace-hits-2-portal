@@ -156,7 +156,7 @@ export default apiInitializer("1.6", (api) => {
                       if (debug) { console.log("New topic created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
                           action: "community_new_topic",
-                          q: {title: encodeURIComponent(post.title), topic_id: post.topic_id, post_id: post.id},
+                          q: JSON.stringify({title: encodeURIComponent(post.title), topic_id: post.topic_id, post_id: post.id}),
                           xid: currentUser.external_id
                       });
                   } else if (post.post_number > 1) {
@@ -164,7 +164,7 @@ export default apiInitializer("1.6", (api) => {
                       if (debug) { console.log("Reply created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
                           action: "community_reply",
-                          q: {replay_length: encodeURIComponent(post.raw).length, topic_id: post.topic_id, post_id: post.id},
+                          q: JSON.stringify({replay_length: encodeURIComponent(post.raw).length, topic_id: post.topic_id, post_id: post.id}),
                           xid: currentUser.external_id
                       });
                   }
