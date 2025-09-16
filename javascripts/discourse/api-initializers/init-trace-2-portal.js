@@ -152,14 +152,14 @@ export default apiInitializer("1.6", (api) => {
                   if (secode !== window.algoSecVar_1) { return; }
 
                   // New topic: post.post_number === 1
-                  if (post.post_count === 1) {
+                  if (post.posts_count === 1) {
                       if (debug) { console.log("New topic created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
                           action: "community_new_topic",
                           q: JSON.stringify({title: encodeURIComponent(post.title), topic_id: post.topic_id, post_id: post.id}),
                           xid: currentUser.external_id
                       });
-                  } else if (post.post_count > 1) {
+                  } else if (post.posts_count > 1) {
                       // Reply to topic
                       if (debug) { console.log("Reply created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
@@ -169,7 +169,7 @@ export default apiInitializer("1.6", (api) => {
                       });
                   }
               });
-              
+
               // Listen for composer:post:success
               api.onAppEvent("composer:post:success", (composerModel, post) => {
                   if (debug) { console.log("composer:post:success:", post); }
