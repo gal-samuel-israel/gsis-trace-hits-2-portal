@@ -141,7 +141,8 @@ export default apiInitializer("1.6", (api) => {
                               // Check if the topic was created within the last 30 seconds
                               const createdAt = new Date(firstPost.created_at).getTime();
                               const now = Date.now();
-                              if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds                                  
+                              if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds
+                                  // Track as new topic                             
                                   traceThis(postTo, secode, window.algoSecVar_2, {
                                       action: "community_new_topic",
                                       q: JSON.stringify({
@@ -157,7 +158,7 @@ export default apiInitializer("1.6", (api) => {
                         });
                     }
                   }
-                  //track hit if not new topic
+                  // Track hit if not new topic
                   if(traceCheck.shouldTrace) {                                                                                 
                       var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                                              
                       if(!window.algoTrace){return false;}
@@ -182,16 +183,8 @@ export default apiInitializer("1.6", (api) => {
                   var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
                   if (secode !== window.algoSecVar_1) { return; }
 
-                  // New topic: post.post_number === 1
-                  if (post.posts_count === 1) {
-                      if (debug) { console.log("New topic created:", post); }
-                      traceThis(postTo, secode, window.algoSecVar_2, {
-                          action: "community_new_topic",
-                          q: JSON.stringify({title: encodeURIComponent(post.title), topic_id: post.topic_id, post_id: post.id}),
-                          xid: currentUser.external_id
-                      });
-                  } else if (post.posts_count > 1) {
-                      // Reply to topic
+                  if (post.posts_count > 1) {
+                      // Trace Reply to topic
                       if (debug) { console.log("Reply created:", post); }
                       traceThis(postTo, secode, window.algoSecVar_2, {
                           action: "community_reply",
@@ -200,13 +193,8 @@ export default apiInitializer("1.6", (api) => {
                       });
                   }
               });
-
-              // Listen for composer:post:success
-              api.onAppEvent("composer:post:success", (composerModel, post) => {
-                  if (debug) { console.log("composer:post:success:", post); }
-              });
-
-              //will run once (or first page load or a page refresh)
+             
+              // will run once (or first page load or a page refresh)
               if(window.algoTrace){
                   var onloadTrace = isUrlForTracing(window.location.pathname);
                   if(onloadTrace.shouldTrace) {
