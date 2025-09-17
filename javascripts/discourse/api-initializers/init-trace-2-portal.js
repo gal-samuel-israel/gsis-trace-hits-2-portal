@@ -128,7 +128,6 @@ export default apiInitializer("1.6", (api) => {
 
               appEvents.on('page:changed', data => {                
                   var traceCheck = isUrlForTracing(data.url);                  
-                  let topicCreationTime = false;
                   if (traceCheck.hasPrefix) { // topic page
                     // Extract topic ID from URL, e.g. /t/topic-title/123
                     const match = data.url.match(/\/t\/[^\/]+\/(\d+)/);
@@ -142,12 +141,12 @@ export default apiInitializer("1.6", (api) => {
                               // Check if the topic was created within the last 30 seconds
                               const createdAt = new Date(firstPost.created_at).getTime();
                               const now = Date.now();
-                              if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds
-                                  topicCreationTime = true;
+                              if ((now - createdAt) < 30000) { // 30,000 ms = 30 seconds                                  
                                   traceThis(postTo, secode, window.algoSecVar_2, {
                                       action: "community_new_topic",
                                       q: JSON.stringify({
                                           title: encodeURIComponent(topicData.title),
+                                          url: encodeURIComponent(data.url),
                                           topic_id: topicData.id,
                                           post_id: firstPost.id
                                       }),
@@ -159,7 +158,7 @@ export default apiInitializer("1.6", (api) => {
                     }
                   }
                   //track hit if not new topic
-                  if(traceCheck.shouldTrace && !topicCreationTime) {                                                                                 
+                  if(traceCheck.shouldTrace) {                                                                                 
                       var the_action = (traceCheck.hasPrefix) ? 'community_hit':'community_search';                                              
                       if(!window.algoTrace){return false;}
                       var secode = xMD5(currentUser.external_id + window.algoSecVar_2);
