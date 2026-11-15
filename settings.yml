@@ -4,6 +4,16 @@ enable_debug_for_user_ids:
   list_type: simple
   regex: "^\\d+$"
   description: "Enable debug for specific users by numeric ID"
+enable_new_trace_logic_for_all:
+  type: bool
+  default: false
+  description: "Step 2 — ON: all users use NEW trace logic (2026-11-15+, v2026.11-safe). Step 1 — OFF: only IDs below use NEW logic."
+new_trace_logic_user_ids:
+  type: list
+  default: "2|42"
+  list_type: simple
+  regex: "^\\d+$"
+  description: "Step 1 — Discourse user IDs on NEW logic (2026-11-15+). Everyone else uses LEGACY pre-2026-11-15 until for_all is ON."
 enable_debug_for_admins:
   type: bool
   default: true
